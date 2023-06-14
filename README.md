@@ -75,8 +75,16 @@ The simulator can be executed with several arguments with a combination of all p
 | Options | Description | Default |
 | --- | --- | --- |
 | `-run_number` | The number of simulations to run in parallel | 1 |
-| `-run_number` | The number of simulations to run in parallel | 1 |
-| `-run_number` | The number of simulations to run in parallel | 1 |
+| `-mode` | Request the script to run new simulations from the input starting materials `init`, or continue the previous runs from existed simulation outputs `cont` | `init` |
+| `-g` | Maxium generations to simulate | 5 |
+| `-R` | Basic reproductive number | 2 |
+| `--sample_time` | Save the intermediate simulated population every `sample_time` generations | 50 |
+| `--redo_number` | Allow each simulation to be repeated for `redo_number` times before acquiring a simulated viral rebound | 5 |
+| `-rebound_size` | Population size threshould to define a simulated viral rebound | 5000 |
+| `-treatment` | Define the synthetic drug class to be used in the simulator | 'A' |
+| `--cores` | Number of cores to use | 1 |
+
+
 
 
 
