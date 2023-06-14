@@ -34,7 +34,7 @@ conda env create -f simulator.yml
 ```
 Activate the environment before running the simulator:
 ```
-conda activate Simu
+conda activate simulator
 ```
 
 ## Dependencies
