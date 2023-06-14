@@ -1,4 +1,4 @@
-name: Simu
+name: simulator
 channels:
   - bioconda
   - conda-forge
