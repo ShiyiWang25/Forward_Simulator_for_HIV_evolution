@@ -113,7 +113,7 @@ python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa 
 
 The results of the simulations are to be saved in the output folder defined by `-o` in the command line.
 
-* In each independent simulation:
+In each independent simulation:
 
   * Each simulation will have its onw subfolder named after the number of the starting materials:
     - The outputs of the simulation starting from material group #11 will be stored in subfolder Outputs/_Simulation_time_11_.
