@@ -31,6 +31,10 @@ Create the environment from the [simulator.yml](https://github.com/ShiyiWang25/2
 ```
 conda env create -f simu.yml
 ```
+Activate the environment before running the simulator:
+```
+conda activate Simu
+```
 
 ## Dependencies
 * Python = 3.6.10
@@ -53,9 +57,13 @@ In the [**Test Dataset**](https://github.com/ShiyiWang25/202306_Simulator/tree/m
   * equally assigned to 8 synthetic drug classes (from A to H)
 
 The simulator can be executed with several arguments with a combination of all possible options as bellow:
-```
-python3 ../scripts/Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences_2.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ./ -kmb ../scripts/kmb_unbiased_0122_4.csv -settings ./settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv
-```
+
+### Command Line ARGS:
+
+| ARGS | Description |
+| --- | --- |
+| `-seed_pop` | Starting materials for the simulator stored in a FASTA file |
+| `-ref` | Reference sequence stored in a FASTA file |
 
 ### Command Line Options:
 
