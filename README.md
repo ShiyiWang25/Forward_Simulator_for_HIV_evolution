@@ -57,7 +57,7 @@ In the [**Test Dataset**](https://github.com/ShiyiWang25/202306_Simulator/tree/m
   * 24 pairs in total
   * equally assigned to 8 synthetic drug classes (from A to H)
 
-The simulator can be executed with several arguments with a combination of all possible options as bellow:
+The simulator can be executed with several arguments with a combination of all possible options as below:
 
 ### Command Line ARGS:
 
@@ -76,21 +76,21 @@ The simulator can be executed with several arguments with a combination of all p
 | Options | Description | Default |
 | --- | --- | --- |
 | `-run_number` | The number of simulations to run in parallel | 1 |
-| `-mode` | Request the script to run new simulations from the input starting materials `init`, or continue the previous runs from existed simulation outputs `cont` | `init` |
+| `-mode` | Request the script to run new simulations from the input starting materials `init`, or continue the previous runs from existing simulation outputs `cont` | `init` |
 | `--start_number` | Tell the script to use the materials in the `seed_pop` starting from `start_number` | 1 |
 | `--disc_simu` | Instead of starting from a specific material group, define the groups of materials to use in the `seed_pop` | None |
-| `-g` | Maxium generations to simulate | 5 |
+| `-g` | Maxmium generations to simulate | 5 |
 | `-R` | Basic reproductive number | 2 |
 | `-snv` | Mutation rate | 0.000036 |
 | `-rec` | Recombination rate | 0.002 |
 | `--sample_time` | Save the intermediate simulated population every `sample_time` generations | 50 |
 | `--redo_number` | Allow each simulation to be repeated for `redo_number` times before acquiring a simulated viral rebound | 5 |
-| `-rebound_size` | Population size threshould to define a simulated viral rebound | 5000 |
+| `-rebound_size` | Population size threshold to define a simulated viral rebound | 5000 |
 | `-treatment` | Define the synthetic drug class to be used in the simulator | 'A' |
 | `--cores` | Number of cores to use | 1 |
 
 ### Here are a few example command lines:
-1. Run 5 indepedent simulations using materials #1 to #5 with basic a reproductive ratio of 2.6:
+1. Run 5 independent simulations using materials #1 to #5 with basic a reproductive ratio of 2.6:
  - Allow the viral populations to evolve for 800 generations
  - Allow 10 attempts for each simulation to reach simulated viral rebound (simulated viral population size > 150000)
  - No sampling during each simulation (`sample_time` > `g`)
@@ -99,11 +99,11 @@ The simulator can be executed with several arguments with a combination of all p
 ```
 python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag Test  -o ../Outputs -run_number 5 -g 800 -R 2.6 --sample_time 900 -treatment A --redo_number 10 -rebound_size 150000 --cores 5
 ```
-2. Run 2 indepedent simulations using materials #23 to #44 with a basic reproductive ratio of 2.6:
+2. Run 2 independent simulations using materials #23 to #44 with a basic reproductive ratio of 2.6:
 ```
 python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag Test -o ../Outputs --disc_simu  ../materials/disc_simu.txt --run_number 2 -g 800 -R 2.6 -sample_time 900 -treatment A --redo_number 10  -rebound_size 150000 --cores 2
 ```
-3. Continuous the 2 simulations from the simulated outputs of **example 2**:
+3. Continuous the 2 simulations from the simulated outputs of **Example 2**:
  - switching to treatment B
 ```
 python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa  -kmb ../materials/kmb_unbiased_0122_4.csv --settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -tag Test -o ../Outputs -mode cont -run_number 2 --disc_simu  ../materials/disc_simu.txt  -g 800 -R 2.6 --sample_time 900 -treatment B --redo_number 10 -rebound_size 150000 --cores 2
@@ -115,8 +115,8 @@ The results of the simulations are to be saved in the output folder defined by `
 
 In each independent simulation:
 
-  * Each simulation will have its onw subfolder named after the number of the starting materials:
-    - The outputs of the simulation starting from material group #11 will be stored in subfolder Outputs/_Simulation_time_11_.
+  * Each simulation will have its unique subfolder named after the number of the starting materials:
+    - The outputs of the simulation starting from material group #11 will be stored in the subfolder Outputs/_Simulation_time_11_.
   
   * The simulator collects the viral population at the simulated viral rebound, the name of which composes of:
     - Tag
@@ -124,7 +124,7 @@ In each independent simulation:
     - number of generations took to rebound
     - For one simulated viral rebound at generation 100 under synthetic drug class 'A' with tag 'Test': `Test_simu_A_g100_rebound.fa`
     
-  * The size of the simulated population over generation is recorded in _VL_tracking_file.csv_.
+  * The size of the simulated population over generations is recorded in _VL_tracking_file.csv_.
 
   * Other Metadata of this simulation is stored in _Metadata.csv_:
     - Basic R
