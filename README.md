@@ -16,6 +16,7 @@ This individual virus-based forward simulator is written in _Python_.
 ![Image](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Figures/Simulator_WorkFlow.png)
 * This simulator simulates the viral evolution by generations (Figure A)
   * In each generation, individual genomes go through 4 steps sequentially: mutation, recombination, fitness calculation, and replication.
+  * Mutation and recombination steps are performed using the _ARGS_ and _IT_ modules in the [_mutation-simulator(ver2.0.03)_](https://github.com/mkpython3/Mutation-Simulator), with specific modifications made to fulfill the purposes of this work.
   
 * The simulator stops in either of the 2 conditions (Figure B):
   1. Simulated viral rebound: the size of the simulated population exceed a given threshold, e.g., 150,000 genomes
@@ -28,7 +29,6 @@ This individual virus-based forward simulator is written in _Python_.
 
 Create the environment from the [simu.yml](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Installation/simulator.yml) file through [Conda](https://anaconda.org/anaconda/conda):
 ```
-# code block
 conda env create -f simu.yml
 ```
 
@@ -39,6 +39,19 @@ conda env create -f simu.yml
 * pysam = 0.16.0.1
 * joblib = 1.1.0
 * tqdm = 4.62.3
-* 
+
+## Methods
+
+This simulator starts with individual HIV-1 genomes stored in a FASTA file. 
+In the [**Test Dataset**](), we provided three files needed for one test simulation:
+ 1. starting materials for the simulator
+  * we provided the 83 groups of starting materials for 83 independent simulations. Each group has 5 _protease_ sequences.
+ 2. the quantified effects of different level of mutational burden on viral fitness
+ 3. 24 pairs of synthetic co-variant mutation, equally assigned to 8 synthetic drug classes
+
+
+
+
+
 
 
