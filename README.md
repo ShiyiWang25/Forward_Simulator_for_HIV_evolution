@@ -76,23 +76,37 @@ The simulator can be executed with several arguments with a combination of all p
 | --- | --- | --- |
 | `-run_number` | The number of simulations to run in parallel | 1 |
 | `-mode` | Request the script to run new simulations from the input starting materials `init`, or continue the previous runs from existed simulation outputs `cont` | `init` |
+| `--start_number` | Tell the script to use the materials in the `seed_pop` starting from `start_number` | 1 |
+| `--disc_simu` | Instead of starting from a specific material group, define the groups of materials to use in the `seed_pop` | None |
 | `-g` | Maxium generations to simulate | 5 |
 | `-R` | Basic reproductive number | 2 |
+| `-snv` | Mutation rate | 0.000036 |
+| `-rec` | Recombination rate | 0.002 |
 | `--sample_time` | Save the intermediate simulated population every `sample_time` generations | 50 |
 | `--redo_number` | Allow each simulation to be repeated for `redo_number` times before acquiring a simulated viral rebound | 5 |
 | `-rebound_size` | Population size threshould to define a simulated viral rebound | 5000 |
 | `-treatment` | Define the synthetic drug class to be used in the simulator | 'A' |
 | `--cores` | Number of cores to use | 1 |
 
-
-
-
-
-
+### Here are a few example
+1. Run 5 indepedent simulations using materials #1 to #5 with basic a reproductive ratio of 2.6:
+ - Allow the viral populations to evolve for 800 generations
+ - Allow 10 attempts for each simulation to reach simulated viral rebound (simulated viral population size > 150000)
+ - No sampling during each simulation (`sample_time` > `g`)
+ - Use 5 cores in parallel
 ```
-conda activate Simu
-python3 ../scripts/Simu_V9_3_hpc_dh.py -run_number 1 -mode cont --start_number 32 -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ./ -g 800 -R 2.6 -kmb ../scripts/kmb_unbiased_0122_4.csv --sample_time 900 -treatment B --redo_number 20 -settings ./settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -rebound_size 200000 --cores 1
+python3 Simu_V9_3_hpc_dh_2.py -run_number 5 -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ../Outputs -g 800 -R 2.6 -kmb ../materials/kmb_unbiased_0122_4.csv --sample_time 900 -treatment A --redo_number 10 -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -rebound_size 150000 --cores 5
 ```
+2. Run 2 indepedent simulations using materials #23 to #44 with a basic reproductive ratio of 2.6:
+```
+python3 Simu_V9_3_hpc_dh_2.py -run_number 2 --disc_simu  ../materials/disc_simu.txt -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ../Outputs -g 800 -R 2.6 -kmb ../materials/kmb_unbiased_0122_4.csv --sample_time 900 -treatment A --redo_number 10 -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -rebound_size 150000 --cores 2
+```
+3. Continuous the 2 simulations from the simulated outputs of **example 2**:
+ - switching to treatment B
+```
+python3 Simu_V9_3_hpc_dh_2.py -mode cont -run_number 2 --disc_simu  ../materials/disc_simu.txt -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ../Outputs -g 800 -R 2.6 -kmb ../materials/kmb_unbiased_0122_4.csv --sample_time 900 -treatment B --redo_number 10 -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -rebound_size 150000 --cores 2
+```
+
 
 
 
