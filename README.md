@@ -64,8 +64,20 @@ The simulator can be executed with several arguments with a combination of all p
 | --- | --- |
 | `-seed_pop` | Starting materials for the simulator stored in a FASTA file |
 | `-ref` | Reference sequence stored in a FASTA file |
+| `-kmb` | Quantified effects of mutational burden on viral fitness in the protease genome |
+| `-settings` | Values for all variables used in the simulator stored in a TXT file |
+| `-score_info` | Input synthetic co-variant mutation pairs stored in a CSV file|
+| `--tag` | Name tag for output files|
+| `-o` | Output directory to store the simulation results |
 
 ### Command Line Options:
+
+| Options | Description | Default |
+| --- | --- | --- |
+| `-run_number` | The number of simulations to run in parallel | 1 |
+| `-run_number` | The number of simulations to run in parallel | 1 |
+| `-run_number` | The number of simulations to run in parallel | 1 |
+
 
 
 
