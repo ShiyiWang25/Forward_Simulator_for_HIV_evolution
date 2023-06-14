@@ -11,6 +11,8 @@ This individual virus-based forward simulator is written in _Python_.
 
 ## Features
 
+![Image](Figures/Simulator_WorkFlow.png)
+
 * The current version of this simulator focuses on the 297-nucleotide HIV-1 _protease_ sequence.
 * This simulator simulates the viral evolution by generations
   * In each generation, individual genomes go through 4 steps sequentially: mutation, recombination, fitness calculation, and replication.
@@ -20,7 +22,7 @@ This individual virus-based forward simulator is written in _Python_.
   2. Simulated viral suppression: the size of the simulated population is continuously lower than a given threshold, e.g., 100 genomes, for at least 3 generations.
   
 * We designed linkages by generating co-variant mutation pairs composed of synthetic DRM and synthetic compensatory mutations in a 1-to-1 relationship.
-* Each co-variant mutation pair designed has completed resistance and high fitness, which is necessary and sufficient to lead to a simulated viral rebound.
+ * Each co-variant mutation pair designed has completed resistance and high fitness, which is necessary and sufficient to lead to a simulated viral rebound.
 
 
 
