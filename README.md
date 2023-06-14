@@ -26,7 +26,7 @@ This individual virus-based forward simulator is written in _Python_.
 
 ## Installation
 
-Create the environment from the [simu.yml]() file through [Conda](https://anaconda.org/anaconda/conda):
+Create the environment from the [simu.yml](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Installation/simulator.yml) file through [Conda](https://anaconda.org/anaconda/conda):
 ```
 # code block
 conda env create -f simu.yml
