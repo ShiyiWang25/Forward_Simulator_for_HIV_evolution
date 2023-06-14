@@ -3,6 +3,7 @@
 **This is an individual virus-based forward simulator designed to simulate the acquisition of co-variant mutations in the HIV-1 protease sequence during resistance development.**
 ---
 
+
 ## Description
 
 This forward simulator models the genetic changes occurring in individual HIV-1 protease genomes during drug-mediated selection over time, encompassing both mutations and the recombination process. It quantifies the fitness of each genome and simulates their evolution under drug pressure.  In addition to capturing Drug-Resistance Mutations (DRMs) that directly contribute to resistance, the simulator incorporates compensatory mutations that mitigate the viral fitness loss caused by DRMs. Throughout the simulation, the effect of each DRM on viral fitness is quantified, and the presence of a compensatory mutation within the same genome earns a bonus point. In this way, this individual virus-based simulator recaptures the selection of co-variant mutations in the HIV protease sequence during drug-mediated selection, allowing for the generation of simulated drug-experienced samples for analysis.
@@ -100,15 +101,43 @@ python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa 
 ```
 2. Run 2 indepedent simulations using materials #23 to #44 with a basic reproductive ratio of 2.6:
 ```
-python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag 0201 -o ../Outputs --disc_simu  ../materials/disc_simu.txt --run_number 2 -g 800 -R 2.6 -sample_time 900 -treatment A --redo_number 10  -rebound_size 150000 --cores 2
+python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag Test -o ../Outputs --disc_simu  ../materials/disc_simu.txt --run_number 2 -g 800 -R 2.6 -sample_time 900 -treatment A --redo_number 10  -rebound_size 150000 --cores 2
 ```
 3. Continuous the 2 simulations from the simulated outputs of **example 2**:
  - switching to treatment B
 ```
-python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa  -kmb ../materials/kmb_unbiased_0122_4.csv --settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -tag 0201 -o ../Outputs-mode cont -run_number 2 --disc_simu  ../materials/disc_simu.txt  -g 800 -R 2.6 --sample_time 900 -treatment B --redo_number 10 -rebound_size 150000 --cores 2
+python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa  -kmb ../materials/kmb_unbiased_0122_4.csv --settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -tag Test -o ../Outputs -mode cont -run_number 2 --disc_simu  ../materials/disc_simu.txt  -g 800 -R 2.6 --sample_time 900 -treatment B --redo_number 10 -rebound_size 150000 --cores 2
 ```
 
+### How to read the outputs:
 
+* The results of the simulations are to be saved in the output folder defined by `-o` in the command line.
+* In each independent simulation:
+ * Each simulation will have its onw subfolder named after the number of the starting materials:
+  - The outputs of the simulation starting from material group #11 will be stored in subfolder Outputs/_Simulation_time_11_.
+ * The simulator collects the viral population at the simulated viral rebound, the name of which composes of:
+  - Tag
+  - treatment
+  - number of generations took to rebound
+  - For one simulated viral rebound at generation 100 under synthetic drug class 'A' with tag 'Test': `Test_simu_A_g100_rebound.fa`
+ * The size of the simulated population over generation is recorded in _VL_tracking_file.csv_.
+ * Other Metadata of this simulation is stored in _Metadata.csv_:
+  - Basic R
+  - Repeat time
+  - Starting viral population
+  - Reference 
+  - Mutation rate & Recombination rate
+  - Rebound size
+  - Initial population size
+  - Input material group number
+  - Settings used
+  - Treatment
+  - population size over generations
+  - Simulation Outcome: 
+   - Suppression: In Round 0: Virus is completely suppressed in treatment A
+   - Rebound: In treatment A: Virus rebound at generation 100
+   
+ 
 
 
 
