@@ -95,6 +95,10 @@ The simulator can be executed with several arguments with a combination of all p
  - No sampling during each simulation (`sample_time` > `g`)
  - Use 5 cores in parallel
 ```
+python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag Test  -o ../Outputs
+ -run_number 5 -g 800 -R 2.6 --sample_time 900 -treatment A --redo_number 10 -rebound_size 150000 --cores 5
+
+
 python3 Simu_V9_3_hpc_dh_2.py -run_number 5 -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ../Outputs -g 800 -R 2.6 -kmb ../materials/kmb_unbiased_0122_4.csv --sample_time 900 -treatment A --redo_number 10 -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -rebound_size 150000 --cores 5
 ```
 2. Run 2 indepedent simulations using materials #23 to #44 with a basic reproductive ratio of 2.6:
