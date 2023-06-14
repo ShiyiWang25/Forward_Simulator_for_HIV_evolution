@@ -43,11 +43,12 @@ conda env create -f simu.yml
 ## Methods
 
 This simulator starts with individual HIV-1 genomes stored in a FASTA file. 
-In the [**Test Dataset**](), we provided three files needed for one test simulation:
- 1. starting materials for the simulator
-  * we provided the 83 groups of starting materials for 83 independent simulations. Each group has 5 _protease_ sequences.
- 2. the quantified effects of different level of mutational burden on viral fitness
- 3. 24 pairs of synthetic co-variant mutation, equally assigned to 8 synthetic drug classes
+In the [**Test Dataset**](https://github.com/ShiyiWang25/202306_Simulator/tree/main/Data), we provided three files needed to start one test simulation:
+ 1. starting materials for the simulator: [Simu_starting_sequences_2.fa](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/Simu_starting_sequences_2.fa)
+  * we provided the 83 groups of starting materials for 83 independent simulations. 
+  * Each group has 5 _protease_ sequences.
+ 2. the quantified effects of different level of mutational burden on viral fitness: [kmb_unbiased_0122_4.csv](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/kmb_unbiased_0122_4.csv)
+ 3. 24 pairs of synthetic co-variant mutation, equally assigned to 8 synthetic drug classes: [SimuV9_scoring_system_0130](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/SimuV9_scoring_system_0130.csv)
 
 
 
