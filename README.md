@@ -27,7 +27,7 @@ This individual virus-based forward simulator is written in _Python_.
 
 ## Installation
 
-Create the environment from the [simu.yml](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Installation/simulator.yml) file through [Conda](https://anaconda.org/anaconda/conda):
+Create the environment from the [simulator.yml](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Installation/simulator.yml) file through [Conda](https://anaconda.org/anaconda/conda):
 ```
 conda env create -f simu.yml
 ```
@@ -47,8 +47,26 @@ In the [**Test Dataset**](https://github.com/ShiyiWang25/202306_Simulator/tree/m
  1. starting materials for the simulator: [Simu_starting_sequences_2.fa](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/Simu_starting_sequences_2.fa)
   * we provided the 83 groups of starting materials for 83 independent simulations. 
   * Each group has 5 _protease_ sequences.
- 2. the quantified effects of different level of mutational burden on viral fitness: [kmb_unbiased_0122_4.csv](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/kmb_unbiased_0122_4.csv)
- 3. 24 pairs of synthetic co-variant mutation, equally assigned to 8 synthetic drug classes: [SimuV9_scoring_system_0130](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/SimuV9_scoring_system_0130.csv)
+ 2. the quantified effects of mutational burden on viral fitness: [kmb_unbiased_0122_4.csv](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/kmb_unbiased_0122_4.csv)
+ 3. synthetic co-variant mutation: [SimuV9_scoring_system_0130](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/SimuV9_scoring_system_0130.csv)
+  * 24 pairs in total
+  * equally assigned to 8 synthetic drug classes (from A to H)
+
+The simulator can be executed with several arguments with a combination of all possible options as bellow:
+```
+python3 ../scripts/Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences_2.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ./ -kmb ../scripts/kmb_unbiased_0122_4.csv -settings ./settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv
+```
+
+### Command Line Options:
+
+
+
+```
+conda activate Simu
+python3 ../scripts/Simu_V9_3_hpc_dh.py -run_number 1 -mode cont --start_number 32 -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa --tag 0201 -o ./ -g 800 -R 2.6 -kmb ../scripts/kmb_unbiased_0122_4.csv --sample_time 900 -treatment B --redo_number 20 -settings ./settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -rebound_size 200000 --cores 1
+```
+
+
 
 
 
