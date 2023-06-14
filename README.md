@@ -139,8 +139,8 @@ In each independent simulation:
     - Treatment
     - population size over generations
     - Simulation Outcome: 
-      - Suppression: In Round 0: Virus is completely suppressed in treatment A
-      - Rebound: In treatment A: Virus rebound at generation 100
+      - Suppression Notice: In Round 0: Virus is completely suppressed in treatment A
+      - Rebound Notice: In treatment A: Virus rebound at generation 100
    
  
 
