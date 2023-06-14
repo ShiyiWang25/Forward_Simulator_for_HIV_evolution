@@ -111,32 +111,32 @@ python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa 
 
 ### How to read the outputs:
 
-* The results of the simulations are to be saved in the output folder defined by `-o` in the command line.
-* In each independent simulation:
+The results of the simulations are to be saved in the output folder defined by `-o` in the command line.
+In each independent simulation:
 
- * Each simulation will have its onw subfolder named after the number of the starting materials:
-  - The outputs of the simulation starting from material group #11 will be stored in subfolder Outputs/_Simulation_time_11_.
- * The simulator collects the viral population at the simulated viral rebound, the name of which composes of:
-  - Tag
-  - treatment
-  - number of generations took to rebound
-  - For one simulated viral rebound at generation 100 under synthetic drug class 'A' with tag 'Test': `Test_simu_A_g100_rebound.fa`
- * The size of the simulated population over generation is recorded in _VL_tracking_file.csv_.
- * Other Metadata of this simulation is stored in _Metadata.csv_:
-  - Basic R
-  - Repeat time
-  - Starting viral population
-  - Reference 
-  - Mutation rate & Recombination rate
-  - Rebound size
-  - Initial population size
-  - Input material group number
-  - Settings used
-  - Treatment
-  - population size over generations
-  - Simulation Outcome: 
-   - Suppression: In Round 0: Virus is completely suppressed in treatment A
-   - Rebound: In treatment A: Virus rebound at generation 100
+  * Each simulation will have its onw subfolder named after the number of the starting materials:
+    - The outputs of the simulation starting from material group #11 will be stored in subfolder Outputs/_Simulation_time_11_.
+  * The simulator collects the viral population at the simulated viral rebound, the name of which composes of:
+   - Tag
+   - treatment
+   - number of generations took to rebound
+   - For one simulated viral rebound at generation 100 under synthetic drug class 'A' with tag 'Test': `Test_simu_A_g100_rebound.fa`
+  * The size of the simulated population over generation is recorded in _VL_tracking_file.csv_.
+  * Other Metadata of this simulation is stored in _Metadata.csv_:
+   - Basic R
+   - Repeat time
+   - Starting viral population
+   - Reference 
+   - Mutation rate & Recombination rate
+   - Rebound size
+   - Initial population size
+   - Input material group number
+   - Settings used
+   - Treatment
+   - population size over generations
+   - Simulation Outcome: 
+     - Suppression: In Round 0: Virus is completely suppressed in treatment A
+     - Rebound: In treatment A: Virus rebound at generation 100
    
  
 
