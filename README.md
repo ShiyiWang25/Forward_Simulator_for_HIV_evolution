@@ -16,6 +16,7 @@ This individual virus-based forward simulator is written in _Python_.
 ![Image](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Figures/Simulator_WorkFlow.png)
 * This simulator simulates the viral evolution by generations (Figure A)
   * In each generation, individual genomes go through 4 steps sequentially: mutation, recombination, fitness calculation, and replication.
+  * Mutation and recombination steps are performed using the _ARGS_ and _IT_ modules in the [_mutation-simulator(ver2.0.03)_](https://github.com/mkpython3/Mutation-Simulator), with specific modifications made to fulfill the purposes of this work.
   
 * The simulator stops in either of the 2 conditions (Figure B):
   1. Simulated viral rebound: the size of the simulated population exceed a given threshold, e.g., 150,000 genomes
@@ -39,6 +40,10 @@ conda env create -f simu.yml
 * pysam = 0.16.0.1
 * joblib = 1.1.0
 * tqdm = 4.62.3
-* 
+
+## Methods
+
+
+
 
 
