@@ -11,13 +11,13 @@ This individual virus-based forward simulator is written in _Python_.
 
 ## Features
 
-![Image](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Figures/Simulator_WorkFlow.png)
-
 * The current version of this simulator focuses on the 297-nucleotide HIV-1 _protease_ sequence.
-* This simulator simulates the viral evolution by generations
+
+![Image](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Figures/Simulator_WorkFlow.png)
+* This simulator simulates the viral evolution by generations (Figure A)
   * In each generation, individual genomes go through 4 steps sequentially: mutation, recombination, fitness calculation, and replication.
   
-* The simulator stops in either of the 2 conditions:
+* The simulator stops in either of the 2 conditions (Figure B):
   1. Simulated viral rebound: the size of the simulated population exceed a given threshold, e.g., 150,000 genomes
   2. Simulated viral suppression: the size of the simulated population is continuously lower than a given threshold, e.g., 100 genomes, for at least 3 generations.
   
