@@ -88,7 +88,7 @@ The simulator can be executed with several arguments with a combination of all p
 | `-treatment` | Define the synthetic drug class to be used in the simulator | 'A' |
 | `--cores` | Number of cores to use | 1 |
 
-### Here are a few example
+### Here are a few example command lines:
 1. Run 5 indepedent simulations using materials #1 to #5 with basic a reproductive ratio of 2.6:
  - Allow the viral populations to evolve for 800 generations
  - Allow 10 attempts for each simulation to reach simulated viral rebound (simulated viral population size > 150000)
