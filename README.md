@@ -24,6 +24,12 @@ This individual virus-based forward simulator is written in _Python_.
 * We designed linkages by generating co-variant mutation pairs composed of synthetic DRM and synthetic compensatory mutations in a 1-to-1 relationship.
  * Each co-variant mutation pair designed has completed resistance and high fitness, which is necessary and sufficient to lead to a simulated viral rebound.
 
+## Installation
 
+Create the environment from the [simu.yml]() file through [Conda](https://anaconda.org/anaconda/conda):
+```
+# code block
+conda env create -f simu.yml
+```
 
 
