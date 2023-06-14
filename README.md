@@ -48,7 +48,7 @@ In the [**Test Dataset**](https://github.com/ShiyiWang25/202306_Simulator/tree/m
   * we provided the 83 groups of starting materials for 83 independent simulations. 
   * Each group has 5 _protease_ sequences.
  2. the quantified effects of different level of mutational burden on viral fitness: [kmb_unbiased_0122_4.csv](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/kmb_unbiased_0122_4.csv)
- 3. 24 pairs of synthetic co-variant mutation, equally assigned to 8 synthetic drug classes: [SimuV9_scoring_system_0130] (https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/SimuV9_scoring_system_0130.csv)
+ 3. 24 pairs of synthetic co-variant mutation, equally assigned to 8 synthetic drug classes: [SimuV9_scoring_system_0130](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/SimuV9_scoring_system_0130.csv)
 
 
 
