@@ -11,7 +11,7 @@ This individual virus-based forward simulator is written in _Python_.
 
 ## Features
 
-![Image](Figures/Simulator_WorkFlow.png)
+![Image]([Figures/Simulator_WorkFlow.png](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Figures/Simulator_WorkFlow.png))
 
 * The current version of this simulator focuses on the 297-nucleotide HIV-1 _protease_ sequence.
 * This simulator simulates the viral evolution by generations
