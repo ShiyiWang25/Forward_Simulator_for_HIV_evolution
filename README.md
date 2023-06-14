@@ -32,4 +32,13 @@ Create the environment from the [simu.yml](https://github.com/ShiyiWang25/202306
 conda env create -f simu.yml
 ```
 
+## Dependencies
+* Python = 3.6.10
+* pandas = 1.0.5
+* numpy = 1.19.5
+* pysam = 0.16.0.1
+* joblib = 1.1.0
+* tqdm = 4.62.3
+* 
+
 
