@@ -34,27 +34,26 @@ pip install simulator-sw-0701 --extra-index-url=https://test.pypi.org/simple/
 
 The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/): [simulator-sw-0701 0.0.5](https://test.pypi.org/project/simulator-sw-0701/0.0.5/)
 
+## python_requires = >= 3.9
 ## Dependencies
-* Python = 3.6.10
-* pandas = 1.0.5
-* numpy = 1.19.5
-* pysam = 0.16.0.1
-* joblib = 1.1.0
-* tqdm = 4.62.3
+* numpy
+* pandas
+* pysam
+* joblib
+* pyfaidx
 
-## Methods
+## Test
+The test folder provides some basic materials to perform a test run using this script. The materials provided are:
+1. The reference protease sequences (or the 'wild-type' protease sequence): HXB2_PR.fa
+   - all synthetic sequences generated will be aligned to this reference sequence, based on the alignment results their fitness will be determined
+2. Synthetic Drug-Resistance and compensatory mutation pairs stored in one CSV file: score_system.csv
+   - 8 synthetic drug pressure are provided, named from A to H
+   - for each synthetic drug pressure, 3 pairs of synthetic mutation pairs are assigned
+3. The values for variables used in this simulator: settings.txt
+4. Eleven different viral populations for performing 11 independent simulation runs:
+   - each viral population has 30,000 synthetic Drug-Naive protease sequences
 
-This simulator starts with individual HIV-1 genomes stored in a FASTA file. 
-In the [**Test Dataset**](https://github.com/ShiyiWang25/202306_Simulator/tree/main/Data), we provided three files needed to start one test simulation:
- 1. starting materials for the simulator: [Simu_starting_sequences_2.fa](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/Simu_starting_sequences_2.fa)
-  * we provided the 83 groups of starting materials for 83 independent simulations. 
-  * Each group has 5 _protease_ sequences.
- 2. the quantified effects of mutational burden on viral fitness: [kmb_unbiased_0122_4.csv](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/kmb_unbiased_0122_4.csv)
- 3. synthetic co-variant mutation: [SimuV9_scoring_system_0130](https://github.com/ShiyiWang25/202306_Simulator/blob/main/Data/materials/SimuV9_scoring_system_0130.csv)
-  * 24 pairs in total
-  * equally assigned to 8 synthetic drug classes (from A to H)
-
-The simulator can be executed with several arguments with a combination of all possible options as below:
+Besides the agreements shown in the above example command, the simulator can be executed with several other arguments to provide a more detailed control of the viral evolution. All possible arguments are listed below:
 
 ### Command Line ARGS:
 
