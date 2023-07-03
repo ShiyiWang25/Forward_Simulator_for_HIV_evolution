@@ -32,7 +32,7 @@ To install this script with its dependencies, run the following command in your 
 pip install simulator-sw-0701 --extra-index-url=https://test.pypi.org/simple/
 ```
 
-The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/): [simulator-sw-0701 0.0.5](https://test.pypi.org/project/simulator-sw-0701/0.0.5/)
+The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/) using the following link: [simulator-sw-0701 0.0.5](https://test.pypi.org/project/simulator-sw-0701/0.0.5/)
 
 ## python_requires = >= 3.9
 ## Dependencies
@@ -57,53 +57,29 @@ Besides the agreements shown in the above example command, the simulator can be 
 
 ### Command Line ARGS:
 
-| ARGS | Description |
-| --- | --- |
-| `-seed_pop` | Starting materials for the simulator stored in a FASTA file |
-| `-ref` | Reference sequence stored in a FASTA file |
-| `-kmb` | Quantified effects of mutational burden on viral fitness in the protease genome |
-| `-settings` | Values for all variables used in the simulator stored in a TXT file |
-| `-score_info` | Input synthetic co-variant mutation pairs stored in a CSV file|
-| `--tag` | Name tag for output files|
-| `-o` | Output directory to store the simulation results |
-
-### Command Line Options:
-
 | Options | Description | Default |
 | --- | --- | --- |
-| `-run_number` | The number of simulations to run in parallel | 1 |
-| `-mode` | Request the script to run new simulations from the input starting materials `init`, or continue the previous runs from existing simulation outputs `cont` | `init` |
-| `--start_number` | Tell the script to use the materials in the `seed_pop` starting from `start_number` | 1 |
-| `--disc_simu` | Instead of starting from a specific material group, define the groups of materials to use in the `seed_pop` | None |
-| `-g` | Maxmium generations to simulate | 5 |
-| `-R` | Basic reproductive number | 2 |
-| `-snv` | Mutation rate | 0.000036 |
-| `-rec` | Recombination rate | 0.002 |
-| `--sample_time` | Save the intermediate simulated population every `sample_time` generations | 50 |
-| `--redo_number` | Allow each simulation to be repeated for `redo_number` times before acquiring a simulated viral rebound | 5 |
-| `-rebound_size` | Population size threshold to define a simulated viral rebound | 5000 |
-| `-treatment` | Define the synthetic drug class to be used in the simulator | 'A' |
+| `--seed` | Provide a random seed. If not provided, the script will generate one automatically | None |
+| `-m`, `-mode` | Tells the script to run new simulations from the input starting materials by `init`, or continue the previous runs from existing simulation outputs by `cont` | `init` |
+| `-i` | Provides the directory where Fasta files with starting materials are stored` | None |
+| `--run_number` | Pefines the number of simulations to run | 1 |
+| `--start_number` | Provide the index of the first simulation to run | 1 |
+| `--disc_simu` | Provides the index of seperate simulation to run | None |
+| `-r`, `--ref` | Provides the reference sequence | None |
+| `-g` | Maximum number of generations in each simulation | 5 |
+| `--sample_time` | Saves the intermediate simulated population every `sample_time` generations | 5 |
+| `--score_info` | Provides synthetic mutation pairs act against each synthetic drug pressure | None |
+| `--treatment` | Select one synthetic treatment from A to H | None |
+| `--redo_number` | Allow `redo_number` attempts for each simulation before acquiring a simulated viral rebound | 1 |
+| `--settings` | Assigns values to variables used | None |
+| `--snv` | HIV-1 Mutation rate | 0.000036 |
+| `--rec` | HIV-1 Recombination rate | 0.002 |
+| `-R` | Basic reproductive number | 1.25 |
+| `--rebound_size` | Defines the population size threshold to define a simulated viral rebound | 500 |
+| `-o` | Define the folder to store the output files | None |
+| `--tag` | The tag to name output files | None |
 | `--cores` | Number of cores to use | 1 |
 
-### Here are a few example command lines:
-1. Run 5 independent simulations using materials #1 to #5 with basic a reproductive ratio of 2.6:
- - Allow the viral populations to evolve for 800 generations
- - Allow 10 attempts for each simulation to reach simulated viral rebound (simulated viral population size > 150000)
- - No sampling during each simulation (`sample_time` > `g`)
- - Use synthetic drug class 'A'
- - Use 5 cores in parallel
-```
-python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag Test  -o ../Outputs -run_number 5 -g 800 -R 2.6 --sample_time 900 -treatment A --redo_number 10 -rebound_size 150000 --cores 5
-```
-2. Run 2 independent simulations using materials #23 to #44 with a basic reproductive ratio of 2.6:
-```
-python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa -kmb ../materials/kmb_unbiased_0122_4.csv -settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv --tag Test -o ../Outputs --disc_simu  ../materials/disc_simu.txt --run_number 2 -g 800 -R 2.6 -sample_time 900 -treatment A --redo_number 10  -rebound_size 150000 --cores 2
-```
-3. Continuous the 2 simulations from the simulated outputs of **Example 2**:
- - switching to treatment B
-```
-python3 Simu_V9_3_hpc_dh_2.py -seed_pop ../materials/Simu_starting_sequences.fa -ref ../materials/HXB2_PR.fa  -kmb ../materials/kmb_unbiased_0122_4.csv --settings ./materials/settings.txt -score_info ../materials/SimuV9_scoring_system_0130.csv -tag Test -o ../Outputs -mode cont -run_number 2 --disc_simu  ../materials/disc_simu.txt  -g 800 -R 2.6 --sample_time 900 -treatment B --redo_number 10 -rebound_size 150000 --cores 2
-```
 
 ### How to read the outputs:
 
