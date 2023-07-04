@@ -52,6 +52,12 @@ The test folder provides some basic materials to perform a test run using this s
 3. The values for variables used in this simulator: settings.txt
 4. Eleven different viral populations for performing 11 independent simulation runs:
    - each viral population has 30,000 synthetic Drug-Naive protease sequences
+  
+In the Test folder, run the following command line to initiate 3 independent simulation runs.
+This test will stop in minutes as only 5 generations are allowed in each simulation run. The simulation outputs will be saved in `output/Simulation_time_1`, `output/Simulation_time_2`, and `output/Simulation_time_3`.
+```
+python3 -m  simulator_sw_0701 -i start_materials/ -run_number 3 -ref HXB2_PR.fa -score_info score_system.csv -treatment A -settings settings.txt -o ./output -tag test -cores 3 -mode init -g 5 -rebound_size 100000
+```
 
 Besides the agreements shown in the above example command, the simulator can be executed with several other arguments to provide a more detailed control of the viral evolution. All possible arguments are listed below:
 
