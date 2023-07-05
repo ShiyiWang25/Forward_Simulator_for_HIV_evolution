@@ -109,17 +109,17 @@ class Variables:
     def job(self, simulation_time):   
         
         # create the result folder for this simulation run if not existed
-        output_folder = self.o + 'Simulation_time_' + str(simulation_time + 1) + '/' 
+        output_folder = f"{self.o}_Simulation_time_{simulation_time + 1}"
         Path(output_folder).mkdir(parents=True, exist_ok=True)
         
         # name the file with starting materials
-        sequences_file = output_folder + self.tag + '_simu' + '.fa'
+        sequences_file = os.path.join(output_folder, f"{self.tag}_simu.fa")
         
         # create Metadata file
-        Metadata_file = output_folder + 'Metadata' + '.txt'
+        Metadata_file = os.path.join(output_folder, 'Metadata.txt')
         
         # create viral loading tracking file for this simulation run
-        tracking_file = output_folder + 'VL_tracking_file' + '.csv'
+        tracking_file = os.path.join(output_folder, 'VL_tracking_file.csv')
         tracking_treatment_generation_VL = {}
         
         # generate the starting viral population
@@ -138,33 +138,30 @@ class Variables:
         # count the number of repeat 
         redo_count = 0
         
-        while switch == False:
+        while not switch:
             switch, progeny_pool_size_list = self.each_repeat(Metadata_file, simulation_time, 
                                                               sequences_file, p, r, c, MB_DRM,
                                                               redo_count, switch)
             redo_count += 1
             
-            if switch == False: 
+            if not switch: 
                 # repeat
                 # rewrite starting file using the concatemer_side
-                note = 'In Round ' + str(redo_count) + \
-                ': Virus is completely suppressed in treatment ' + str(self.treatment) + \
-                ' with ' + str(progeny_pool_size_list[-1]/progeny_pool_size_list[-2])
-                metadata(Metadata_file, note)
-                write_file_split(concatemer = concatemer_side, \
+                note = (f"In Round {redo_count} : Virus is completely suppressed"
+                        f" in treatment {self.treatment} with"
+                        f" {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}"
+                        f"{metadata(Metadata_file, note)}")
+
+                write_file_split(concatemer = concatemer_side,
                                  output_file_path = sequences_file, tag = self.tag)
 
                 if redo_count >= self.redo_number:
-                    note = 'Virus fails to rebound in all attempts under treatment ' + str(self.treatment)
+                    note = f"Virus fails to rebound in all attempts under treatment {self.treatment}"
                     metadata(Metadata_file, note)
                     return
             
-                else: pass
-            else: pass
-            
         tracking_treatment_generation_VL[self.treatment] = progeny_pool_size_list  
         tracking(tracking_file, self.treatment, initial_pop_size, tracking_treatment_generation_VL)
-        return
     
     def preparation(self, simulation_time, output_folder, sequences_file, Metadata_file):
 
