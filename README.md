@@ -32,7 +32,7 @@ To install this script with its dependencies, run the following command in your 
 pip install simulator-sw-0701==0.0.8 --extra-index-url=https://test.pypi.org/simple/
 ```
 
-The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/) using the following link: [simulator-sw-0701 0.0.5](https://test.pypi.org/project/simulator-sw-0701/0.0.5/)
+The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/) using the following link: [simulator-sw-0701 0.0.8](https://test.pypi.org/project/simulator-sw-0701/0.0.8/)
 
 ## python_requires = >= 3.9
 ## Dependencies
