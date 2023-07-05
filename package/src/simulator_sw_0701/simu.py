@@ -48,10 +48,28 @@ def concatemer_sepNs(input_file_path):
     return (con_seq[:-5]), count_seq
     
 def codon_lib_generator():
-    Base1_list = ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G']
-    Base2_list = ['T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G']
-    Base3_list = ['T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G']
-    AA_list = ['F', 'F', 'L', 'L', 'S', 'S', 'S', 'S', 'Y', 'Y', '*', '*', 'C', 'C', '*', 'W', 'L', 'L', 'L', 'L', 'P', 'P', 'P', 'P', 'H', 'H', 'Q', 'Q', 'R', 'R', 'R', 'R', 'I', 'I', 'I', 'M', 'T', 'T', 'T', 'T', 'N', 'N', 'K', 'K', 'S', 'S', 'R', 'R', 'V', 'V', 'V', 'V', 'A', 'A', 'A', 'A', 'D', 'D', 'E', 'E', 'G', 'G', 'G', 'G']
+    Base1_list = ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T',
+                  'T', 'T', 'T', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
+                  'C', 'C', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'A', 'A', 'A',
+                  'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G',
+                  'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G']
+    Base2_list = ['T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A',
+                  'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C',
+                  'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T',
+                  'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G',
+                  'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A',
+                  'G', 'G', 'G', 'G']
+    Base3_list = ['T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G']
+    AA_list = ['F', 'F', 'L', 'L', 'S', 'S', 'S', 'S', 'Y', 'Y', '*', '*', 'C',
+               'C', '*', 'W', 'L', 'L', 'L', 'L', 'P', 'P', 'P', 'P', 'H', 'H',
+               'Q', 'Q', 'R', 'R', 'R', 'R', 'I', 'I', 'I', 'M', 'T', 'T', 'T',
+               'T', 'N', 'N', 'K', 'K', 'S', 'S', 'R', 'R', 'V', 'V', 'V', 'V',
+               'A', 'A', 'A', 'A', 'D', 'D', 'E', 'E', 'G', 'G', 'G', 'G']
     codon_lib = {}
     
     for i in range(len(Base1_list)):
@@ -61,7 +79,10 @@ def codon_lib_generator():
     
 class Variables:
         
-    def __init__(self, seed, mode, i, run_number, start_number, disc_simu, ref, g, sample_time, score_info, treatment, redo_number, settings, snv, rec, R, rebound_size, o, tag, cores, child_states, simulation_time_list):
+    def __init__(self, seed, mode, i, run_number, start_number,
+                 disc_simu, ref, g, sample_time, score_info,
+                 treatment, redo_number, settings, snv, rec, R,
+                 rebound_size, o, tag, cores, child_states, simulation_time_list):
         self.seed = seed
         self.mode = mode
         self.i = i
@@ -105,7 +126,7 @@ class Variables:
         # store it in sequences_file
         # take nots of metadate
         initial_pop_size, concatemer, p, r, c, MB_DRM = \
-        Variables.preparation(self, simulation_time, output_folder, sequences_file, Metadata_file)
+        self.preparation(simulation_time, output_folder, sequences_file, Metadata_file)
         
         # store the starting materials to "concatemer_side"
         concatemer_side = concatemer
@@ -118,7 +139,9 @@ class Variables:
         redo_count = 0
         
         while switch == False:
-            switch, progeny_pool_size_list = Variables.each_repeat(self, Metadata_file, simulation_time, sequences_file, p, r, c, MB_DRM, redo_count, switch)
+            switch, progeny_pool_size_list = self.each_repeat(Metadata_file, simulation_time, 
+                                                              sequences_file, p, r, c, MB_DRM,
+                                                              redo_count, switch)
             redo_count += 1
             
             if switch == False: 
@@ -153,7 +176,8 @@ class Variables:
             # create initial viral population
             if self.i:
                 initial_pop_size = 30000
-                start_materials_fas = write_starting_pop(simulation_time, get_starting_materials(self.i), initial_pop_size, sequences_file, self.tag)
+                start_materials_fas = write_starting_pop(simulation_time, get_starting_materials(self.i),
+                                                         initial_pop_size, sequences_file, self.tag)
                 concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
 
                 note = 'Initial population size: ' + str(initial_pop_size)
@@ -277,13 +301,15 @@ def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, 
     # recombine
     if rec != 0: # perform recombine
         recombined_mutated_sequences_file = sequences_file.split('.fa')[0] + '_ms_it.fa'# ./HXB2_simu_ms_split_ms_it.fa
-        recombination(input_file = mutated_sequences_file, output_file = recombined_mutated_sequences_file, recombination_rate = float(rec), rng = rng)
+        recombination(input_file = mutated_sequences_file, output_file = recombined_mutated_sequences_file,
+                      recombination_rate = float(rec), rng = rng)
     elif rec == 0: # skep recombination process
         recombined_mutated_sequences_file = mutated_sequences_file
         
     # fitness calculation and viral replication
     df_scores = pd.read_csv(score_info)
-    progeny_list, progeny_pool_size = replication(recombined_mutated_sequences_file, ref, treatment, df_scores, p, r, c, MB_DRM, R, rng)
+    progeny_list, progeny_pool_size = replication(recombined_mutated_sequences_file, ref, treatment,
+                                                  df_scores, p, r, c, MB_DRM, R, rng)
     
     return progeny_list, progeny_pool_size, recombined_mutated_sequences_file
 
