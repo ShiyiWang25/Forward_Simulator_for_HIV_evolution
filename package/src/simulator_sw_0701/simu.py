@@ -125,8 +125,10 @@ class Variables:
         # generate the starting viral population
         # store it in sequences_file
         # take nots of metadate
-        initial_pop_size, concatemer, p, r, c, MB_DRM = \
-        self.preparation(simulation_time, output_folder, sequences_file, Metadata_file)
+        initial_pop_size, concatemer, p, r, c, MB_DRM = self.preparation(simulation_time,
+                                                                         output_folder,
+                                                                         sequences_file,
+                                                                         Metadata_file)
         
         # store the starting materials to "concatemer_side"
         concatemer_side = concatemer
@@ -140,7 +142,7 @@ class Variables:
         
         while not switch:
             switch, progeny_pool_size_list = self.each_repeat(Metadata_file, simulation_time, 
-                                                              sequences_file, p, r, c, MB_DRM,
+                                                              output_folder, sequences_file, p, r, c, MB_DRM,
                                                               redo_count, switch)
             redo_count += 1
             
@@ -217,7 +219,8 @@ class Variables:
 
         return initial_pop_size, concatemer, p, r, c, MB_DRM
 
-    def each_repeat(self, Metadata_file, simulation_time, sequences_file, p, r, c, MB_DRM, redo_count, switch):
+    def each_repeat(self, Metadata_file, simulation_time, sequences_file, 
+                    output_folder, p, r, c, MB_DRM, redo_count, switch):
         # generate random seed
         switch = False
         rng = stochastic_function(self.child_states \
@@ -278,13 +281,13 @@ class Variables:
                 # save intermediate timepoint data
                 # e.g., ./HXB2_simu_g100.fa
                 if generation % self.sample_time == 0:
-                    put_aside = output_folder + self.tag + '_simu' + \
-                    str(self.treatment) + '_g' + str(generation) + '.fa' 
-                    write_pop_file(input_file = recombined_mutated_sequences_file, \
-                                   output_file = put_aside, progeny_list = progeny_list, \
-                                   tag = self.tag)
-                else: pass
+                    put_aside = (f"{output_folder}{self.tag}_simu_"
+                                 f"{self.treatment}_g{generation}.fa")
 
+                    write_pop_file(input_file = recombined_mutated_sequences_file,
+                                   output_file = put_aside, 
+                                   progeny_list = progeny_list,
+                                   tag = self.tag)
 
         return switch, progeny_pool_size_list
 
