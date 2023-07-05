@@ -20,6 +20,12 @@ def simu_treated(args):
         with open(args.disc_simu,'r') as f:
             simulation_time_list = [int(i)-1 for i in f.readline().rstrip().rsplit(', ')]
                                          
+    # create the result folder if not existed
+    if args.o[-1] != '/':
+        args.o += '/'
+    output_directory = args.o
+    Path(output_directory).mkdir(parents=True, exist_ok=True)                                      
+                                        
     # generate random independent seed for each simulation run
     child_states = random_seed_generator(args.seed, args.o, args.run_number *  args.redo_number)
 
@@ -118,7 +124,7 @@ class Variables:
         redo_count = 0
         
         while switch == False:
-            switch, progeny_pool_size_list = Variables.each_repeat(self, Metadata_file, simulation_time, sequences_file, p, r, c, MB_DRM, redo_count, switch)
+            switch, progeny_pool_size_list = Variables.each_repeat(self, Metadata_file, simulation_time, output_folder, sequences_file, p, r, c, MB_DRM, redo_count, switch)
             redo_count += 1
             
             if switch == False: 
@@ -196,7 +202,7 @@ class Variables:
 
         return initial_pop_size, concatemer, p, r, c, MB_DRM
 
-    def each_repeat(self, Metadata_file, simulation_time, sequences_file, p, r, c, MB_DRM, redo_count, switch):
+    def each_repeat(self, Metadata_file, simulation_time, output_folder, sequences_file, p, r, c, MB_DRM, redo_count, switch):
         # generate random seed
         switch = False
         rng = stochastic_function(self.child_states \
