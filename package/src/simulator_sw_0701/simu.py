@@ -10,6 +10,9 @@ import time
 import sys
 from pyfaidx import Fasta, Faidx
 
+EOL = "\n"              # end of line terminator
+
+
 def simu_treated(args):   
 
     # determine simulation run numbers: e.g., from Simulation 1 to Simulation 10
@@ -27,7 +30,7 @@ def simu_treated(args):
     Path(output_directory).mkdir(parents=True, exist_ok=True)                                      
                                         
     # generate random independent seed for each simulation run
-    child_states = random_seed_generator(args.seed, args.o, args.run_number *  args.redo_number)
+    child_states = random_seed_generator(args.o, args.run_number *  args.redo_number, seed=args.seed)
 
     # store all arguments
     # save space for child_states and simulation_time_list
@@ -115,7 +118,7 @@ class Variables:
     def job(self, simulation_time):   
         
         # create the result folder for this simulation run if not existed
-        output_folder = f"{self.o}_Simulation_time_{simulation_time + 1}"
+        output_folder = os.path.join(self.o, f"Simulation_time_{simulation_time + 1}")
         Path(output_folder).mkdir(parents=True, exist_ok=True)
         
         # name the file with starting materials
@@ -158,8 +161,9 @@ class Variables:
                 # rewrite starting file using the concatemer_side
                 note = (f"In Round {redo_count} : Virus is completely suppressed"
                         f" in treatment {self.treatment} with"
-                        f" {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}"
-                        f"{metadata(Metadata_file, note)}")
+                        f" {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
+
+                metadata(Metadata_file, note)
 
                 write_file_split(concatemer = concatemer_side,
                                  output_file_path = sequences_file, tag = self.tag)
@@ -357,26 +361,20 @@ def get_fasta_seq(input_file):
     return seq
 
 def metadata(output_file_path, note):
-    f = open(output_file_path, "a+")
-    f.write(note + '\n')
-    f.close()
-    return
+    with open(output_file_path, "a+") as f:
+        f.write(f"note{EOL}")
 
 def mutator(input_file, output_file, mutation_rate, rng):
     seq_lib = read_fasta_file(input_file)
     seq_names = list(seq_lib.keys())
 
-    open(output_file, 'w').close() # empty the previous mutated_seq_file
-    
-    f = open(output_file, "a+")
-    for seq_name in seq_names:
-        seq = seq_lib[seq_name][:].seq
-        tagline = '>' + seq_name + '\n'
-        f.write(tagline)
-        seq_mut = mutate(seq, mutation_rate, rng)
-        f.write(seq_mut + '\n')
-    f.close()
-    return
+    with open(output_file, "w") as f:
+        for seq_name in seq_names:
+            seq = seq_lib[seq_name][:].seq
+            tagline = f">{seq_name}{EOL}"
+            f.write(tagline)
+            seq_mut = mutate(seq, mutation_rate, rng)
+            f.write(seq_mut + EOL)
 
 def mutate(seq, mutation_rate, rng):
     
@@ -400,26 +398,15 @@ def mutant_sequence(seq, positions, rng):
         mut_seq = mut_seq[:pos] + alt + mut_seq[pos+1:]
     return mut_seq
     
-def random_seed_generator(seed, output_dir, total_number):
-    # generate original seed if no seed is given
-    if not seed:
-        seed = int(time.time())
-        
-    # store the seed used in each simulation run
-    seed_file = output_dir + 'SEED.txt'
-    f = open(seed_file, "w")
-    f_line = 'Seed set to ' + str(seed)
-    f.write(f_line)
-    f.close()
+def random_seed_generator(output_dir, total_number, seed=None):
 
-    # create the RNG that you want to pass around
-    rng = np.random.default_rng(seed)
-    # get the SeedSequence of the passed RNG
-    ss = rng.bit_generator._seed_seq
-    # create n initial independent states
-    child_states = ss.spawn(total_number)
-    
-    return child_states
+    seed = np.random.SeedSequence(entropy=seed)
+
+    # store the seed used in each simulation run
+    with open(os.path.join(output_dir, "SEED.txt"), "w") as f:
+        f.write(f"Seed set to {seed.entropy}{EOL}")
+
+    return seed.spawn(total_number)
     
 def read_fasta_file(input_file):
     seq_lib = Fasta(input_file)
@@ -441,29 +428,23 @@ def recombination(input_file, output_file, recombination_rate, rng):
         seq_to_recombine.remove(paired[0])
         seq_to_recombine.remove(paired[1])
     
-    open(output_file, 'w').close() # empty the previous mutated_seq_file
     
-    f = open(output_file, "a+")
+    with open(output_file, "w") as f:
     
-    for seq_name in seq_names_norecombine:
-        seq = seq_lib[seq_name][:].seq
-        tagline = '>' + seq_name + '\n'
-        f.write(tagline)
-        f.write(seq + '\n')
-        
-    for key, value in recombine_pairs_lib.items():
-        seq1 = seq_lib[key][:].seq
-        seq2 = seq_lib[value][:].seq
-        seq1_rec, seq2_rec = recombine(seq1, seq2, recombination_rate, rng)
-        tagline = '>' + key + '\n'
-        f.write(tagline)
-        f.write(seq1_rec + '\n')
-        tagline = '>' + value + '\n'
-        f.write(tagline)
-        f.write(seq2_rec + '\n')
-        
-    f.close()
-    return
+        for seq_name in seq_names_norecombine:
+            seq = seq_lib[seq_name][:].seq
+            f.write(f">{seq_name}{EOL}")
+            f.write(seq + EOL)
+            
+        for key, value in recombine_pairs_lib.items():
+            seq1 = seq_lib[key][:].seq
+            seq2 = seq_lib[value][:].seq
+            seq1_rec, seq2_rec = recombine(seq1, seq2, recombination_rate, rng)
+            f.write('>' + key + EOL)
+
+            f.write(seq1_rec + EOL)
+            f.write('>' + value + EOL)
+            f.write(seq2_rec + '\n')
 
 def recombine(seq1, seq2, recombination_rate, rng):
     mean = (len(seq1) -1)* recombination_rate
@@ -645,15 +626,13 @@ def write_dh_pop_file(input_file, output_file, progeny_list, progeny_pool_size, 
                 seq_list.append(line.rstrip())
                 
     read_count = 0
-    fo = open(output_file, "w")
-    for progeny in progeny_list:
-        repeat = int(rng.poisson(30000/progeny_pool_size, 1)[0])
-        for r in range(repeat):
-            fo.write('>'+ tag + '_' + str(read_count + 1) +'\n')
-            fo.write(seq_list[progeny-1] + '\n')
-            read_count += 1
-    fo.close()
-
+    with open(output_file, "w") as fo:
+        for progeny in progeny_list:
+            repeat = int(rng.poisson(30000/progeny_pool_size, 1)[0])
+            for r in range(repeat):
+                fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
+                fo.write(seq_list[progeny-1] + EOL)
+                read_count += 1
     return read_count
     
 def write_pop_file(input_file, output_file, progeny_list, tag):
@@ -665,12 +644,11 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
                 seq_list.append(line.rstrip())
                 
     read_count = 0
-    fo = open(output_file, "w")
-    for progeny in progeny_list:
-        fo.write('>'+ tag + '_' + str(read_count + 1) +'\n')
-        fo.write(seq_list[progeny-1] + '\n')
-        read_count += 1
-    fo.close()
+    with open(output_file, "w") as fo:
+        for progeny in progeny_list:
+            fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
+            fo.write(seq_list[progeny-1] + EOL)
+            read_count += 1
     return
         
 def write_args(output_file_path, R, run_number, input_dir, ref, snv, rec, rebound_size):
@@ -703,12 +681,11 @@ def write_args(output_file_path, R, run_number, input_dir, ref, snv, rec, reboun
     
 def write_file_split(concatemer, output_file_path, tag):
     seq_list = concatemer.split('N' * 5)
-    f = open(output_file_path, "w")
-    for i in range(len(seq_list)):
-        f.write('>'+ tag + '_' + str(i + 1) +'\n')
-        f.write(seq_list[i] + '\n')
-    f.close()
-    return
+
+    with open(output_file_path, "w") as f:
+        for i in range(len(seq_list)):
+            f.write('>'+ tag + '_' + str(i + 1) + EOL)
+            f.write(seq_list[i] + EOL)
 
 def write_starting_pop(simulation_time, start_materials, pop_size, output_file_path, tag):
     # generate starting viral population
@@ -722,11 +699,12 @@ def write_starting_pop(simulation_time, start_materials, pop_size, output_file_p
 
     read_count = 0
     repeats = int(pop_size/len(read_list))
-    fo = open(output_file_path, "w")
-    for read in read_list:
-        for i in range(repeats):
-            fo.write('>'+ tag + '_' + str(read_count + 1) +'\n')
-            fo.write(read + '\n')
-            read_count += 1
+
+    with open(output_file_path, "w") as fo:
+        for read in read_list:
+            for i in range(repeats):
+                fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
+                fo.write(read + EOL)
+                read_count += 1
     return start_materials_fas
 
