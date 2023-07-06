@@ -26,8 +26,8 @@ def simu_treated(args):
     # create the result folder if not existed
     if args.o[-1] != '/':
         args.o += '/'
-    output_directory = args.o
-    Path(output_directory).mkdir(parents=True, exist_ok=True)                                      
+
+    Path(args.o).mkdir(parents=True, exist_ok=True)                                      
                                         
     # generate random independent seed for each simulation run
     child_states = random_seed_generator(args.o, args.run_number *  args.redo_number, seed=args.seed)
@@ -190,9 +190,8 @@ class Variables:
                                                          initial_pop_size, sequences_file, self.tag)
                 concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
 
-                note = 'Initial population size: ' + str(initial_pop_size)
-                metadata(Metadata_file, note)
-                note = 'Starting materials collected from file: ' + start_materials_fas
+                note = EOL.join(['Initial population size: ' + str(initial_pop_size),
+                                 'Starting materials collected from file: ' + start_materials_fas])
                 metadata(Metadata_file, note)
                 
             else:
@@ -362,7 +361,7 @@ def get_fasta_seq(input_file):
 
 def metadata(output_file_path, note):
     with open(output_file_path, "a+") as f:
-        f.write(f"note{EOL}")
+        f.write(note + EOL)
 
 def mutator(input_file, output_file, mutation_rate, rng):
     seq_lib = read_fasta_file(input_file)
@@ -653,31 +652,16 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
         
 def write_args(output_file_path, R, run_number, input_dir, ref, snv, rec, rebound_size):
 
-    note = 'Settings used: '
+    note = EOL.join(['Settings used: ',
+                     'Basic R : ' + str(R),
+                     'Repeat time: ' + str(run_number),
+                     'Starting materials stored in: ' + str(input_dir),
+                     'Reference: ' + str(ref),
+                     'Mutation rate: ' + str(snv) + '; Recombination rate: ' + str(rec),
+                     'Rebound size: ' + str(rebound_size),
+                     '---*---*---*---*---*---*---'])
+
     metadata(output_file_path, note)
-    
-    note = 'Basic R : ' + str(R)
-    metadata(output_file_path, note)    
-    
-    note = 'Repeat time: ' + str(run_number)
-    metadata(output_file_path, note)
-    
-    note = 'Starting materials stored in: ' + str(input_dir)
-    metadata(output_file_path, note)
-    
-    note = 'Reference: ' + str(ref)
-    metadata(output_file_path, note)
-    
-    note = 'Mutation rate: ' + str(snv) + '; Recombination rate: ' + str(rec)
-    metadata(output_file_path, note)
-    
-    note = 'Rebound size: ' + str(rebound_size)
-    metadata(output_file_path, note)
-    
-    note = '---*---*---*---*---*---*---'
-    metadata(output_file_path, note)
-    
-    return
     
 def write_file_split(concatemer, output_file_path, tag):
     seq_list = concatemer.split('N' * 5)
