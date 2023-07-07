@@ -221,8 +221,8 @@ class Variables:
         elif self.mode == 'cont':
 
             note = EOL.join(['---*---*---*---*---*---*---',
-                             f"Continue the simulation on {time.strftime("%a, %d %b %Y %H:%M:%S", 
-                                                                         time.gmtime()}"])
+                             f'Continue the simulation on {time.strftime("%a, %d %b %Y %H:%M:%S", 
+                                                                         time.gmtime())}')]
             metadata(Metadata_file, note)
 
             concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
@@ -262,22 +262,22 @@ class Variables:
 
         # simulate in g generations until a viral rebound or suppression is achieved
         for generation in range(1, self.g + 1):
-            progeny_list, progeny_pool_size, recombined_mutated_sequences_file = 
-            each_generation(sequences_file, self.snv, self.rec, self.score_info, 
-                            self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng)
+            progeny_list, progeny_pool_size, recombined_mutated_sequences_file = (
+                each_generation(sequences_file, self.snv, self.rec, self.score_info, 
+                                self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng))
             progeny_pool_size_list.append(progeny_pool_size)
             note = f"{generation}: {progeny_pool_size}"
             metadata(Metadata_file, note)
 
             # check
-            if len(progeny_pool_size_list) >= 3 and progeny_pool_size < 100 and 
-            progeny_pool_size_list[-2] < 100 and progeny_pool_size_list[-3] < 100:
+            if (len(progeny_pool_size_list) >= 3 and progeny_pool_size < 100 and 
+                progeny_pool_size_list[-2] < 100 and progeny_pool_size_list[-3] < 100):
                 break
 
-            elif len(progeny_pool_size_list) >= 3 and 
-            progeny_pool_size > self.rebound_size and 
-            progeny_pool_size_list[-1] > progeny_pool_size_list[-2] and 
-            progeny_pool_size_list[-2] > progeny_pool_size_list[-3]:
+            elif (len(progeny_pool_size_list) >= 3 and 
+                  progeny_pool_size > self.rebound_size and 
+                  progeny_pool_size_list[-1] > progeny_pool_size_list[-2] and 
+                  progeny_pool_size_list[-2] > progeny_pool_size_list[-3]):
                 note = (f"In treatment {self.treatment}:"
                         f" Virus rebound at generation {generation}"
                         f" with {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
@@ -286,8 +286,8 @@ class Variables:
                 # save the rebound viral population
                 # e.g., ./HXB2_simu_g100_rebound.fa
                 rebound_pop_file = os.path.join(output_folder, 
-                                                f"{self.tag}_simu_{self.treatment}_
-                                                g{generation}_rebound.fa")
+                                                f"{self.tag}_simu_{self.treatment}_"
+                                                f"g{generation}_rebound.fa")
                 write_pop_file(input_file = recombined_mutated_sequences_file, \
                                output_file = rebound_pop_file, progeny_list = progeny_list, \
                                tag = self.tag)
@@ -314,8 +314,8 @@ class Variables:
                 # e.g., ./HXB2_simu_g100.fa
                 if generation % self.sample_time == 0:
                     put_aside = os.path.join(output_folder, 
-                                             f"{self.tag}_simu_{self.treatment}_
-                                             g{generation}.fa")
+                                             f"{self.tag}_simu_{self.treatment}_"
+                                             f"g{generation}.fa")
                     write_pop_file(input_file = recombined_mutated_sequences_file,
                                    output_file = put_aside, 
                                    progeny_list = progeny_list,
