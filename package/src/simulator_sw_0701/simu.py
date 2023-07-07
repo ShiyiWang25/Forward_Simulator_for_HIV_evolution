@@ -10,54 +10,95 @@ import time
 import sys
 from pyfaidx import Fasta, Faidx
 
+
+EOL = "\n"              # end of line terminator
+
+
 def simu_treated(args):   
 
     # determine simulation run numbers: e.g., from Simulation 1 to Simulation 10
-    if not args.disc_simu:
-        simulation_time_list = [i for i in range(args.start_number - 1, \
-        args.start_number - 1 + args.run_number)]
-    else:
+
+    simulation_time_list = []
+
+    # protect against negative start_number and run_number
+    if (args.disc_simu is None
+        and args.start_number >= 0
+        and args.run_number > 0):
+
+        for i in range(args.start_number, args.start_number + args.run_number):
+            simulation_time_list.append(i)
+
+    elif os.path.exists(args.disc_simu):
+
         with open(args.disc_simu,'r') as f:
-            simulation_time_list = [int(i)-1 for i in f.readline().rstrip().rsplit(', ')]
-                                         
-    # create the result folder if not existed
-    if args.o[-1] != '/':
-        args.o += '/'
-    output_directory = args.o
-    Path(output_directory).mkdir(parents=True, exist_ok=True)                                      
+
+            for tline in f:
+                # TODO: it wasn't clear to me in the code which item in the string
+                # split was desired.  I used 0 as a place holder, but this should be
+                # validated by Shiyi.
+                tline = tline.split(",")[0].strip()
+
+                simulation_time_list.append(int(tline))
+
+    else:
+        raise ValueError("Invalid disc_simu, start_number or run_number")
+
+    Path(args.o).mkdir(parents=True, exist_ok=True)                                      
                                         
     # generate random independent seed for each simulation run
-    child_states = random_seed_generator(args.seed, args.o, args.run_number *  args.redo_number)
+    child_states = random_seed_generator(args.o,
+                                         args.run_number *  args.redo_number,
+                                         seed=args.seed)
 
     # store all arguments
     # save space for child_states and simulation_time_list
-    simu_var = Variables(args.seed, args.mode, args.i, args.run_number, args.start_number, \
-                         args.disc_simu, args.ref, args.g, args.sample_time, \
-                         args.score_info, args.treatment, args.redo_number, args.settings, \
-                         args.snv, args.rec, args.R, args.rebound_size, args.o, args.tag, \
+    simu_var = Variables(args.seed, args.mode, args.input_dir, args.run_number, args.start_number,
+                         args.disc_simu, args.ref, args.g, args.sample_time,
+                         args.score_info, args.treatment, args.redo_number, args.settings,
+                         args.snv, args.rec, args.R, args.rebound_size, args.o, args.tag,
                          args.cores, child_states, simulation_time_list)
 
     Parallel(n_jobs = simu_var.cores)\
     (delayed(simu_var.job)(simulation_time) for simulation_time in simulation_time_list)
     
+
 def concatemer_sepNs(input_file_path):
     # concatenate all seq in a multi-FASTA file
     con_seq = ''
-    count_seq = 0
+    num_of_n_repeat = 5
     
     with open(input_file_path, 'r') as f:
-        for line in f:
+        for count_seq, line in enumerate(f):
             if '>' not in line:
                 con_seq += line.rstrip()
-                con_seq += 'N' * 5
-                count_seq += 1
+                con_seq += 'N' * num_of_n_repeat
+
     return (con_seq[:-5]), count_seq
+
     
 def codon_lib_generator():
-    Base1_list = ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G']
-    Base2_list = ['T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G']
-    Base3_list = ['T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G']
-    AA_list = ['F', 'F', 'L', 'L', 'S', 'S', 'S', 'S', 'Y', 'Y', '*', '*', 'C', 'C', '*', 'W', 'L', 'L', 'L', 'L', 'P', 'P', 'P', 'P', 'H', 'H', 'Q', 'Q', 'R', 'R', 'R', 'R', 'I', 'I', 'I', 'M', 'T', 'T', 'T', 'T', 'N', 'N', 'K', 'K', 'S', 'S', 'R', 'R', 'V', 'V', 'V', 'V', 'A', 'A', 'A', 'A', 'D', 'D', 'E', 'E', 'G', 'G', 'G', 'G']
+    Base1_list = ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T',
+                  'T', 'T', 'T', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
+                  'C', 'C', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'A', 'A', 'A',
+                  'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G',
+                  'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G']
+    Base2_list = ['T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A',
+                  'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C',
+                  'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G', 'T', 'T', 'T', 'T',
+                  'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'G', 'G', 'G', 'G',
+                  'T', 'T', 'T', 'T', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A',
+                  'G', 'G', 'G', 'G']
+    Base3_list = ['T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G', 'T', 'C', 'A', 'G',
+                  'T', 'C', 'A', 'G']
+    AA_list = ['F', 'F', 'L', 'L', 'S', 'S', 'S', 'S', 'Y', 'Y', '*', '*', 'C',
+               'C', '*', 'W', 'L', 'L', 'L', 'L', 'P', 'P', 'P', 'P', 'H', 'H',
+               'Q', 'Q', 'R', 'R', 'R', 'R', 'I', 'I', 'I', 'M', 'T', 'T', 'T',
+               'T', 'N', 'N', 'K', 'K', 'S', 'S', 'R', 'R', 'V', 'V', 'V', 'V',
+               'A', 'A', 'A', 'A', 'D', 'D', 'E', 'E', 'G', 'G', 'G', 'G']
     codon_lib = {}
     
     for i in range(len(Base1_list)):
@@ -65,12 +106,16 @@ def codon_lib_generator():
         codon_lib[codon] = AA_list[i]
     return codon_lib
     
+
 class Variables:
         
-    def __init__(self, seed, mode, i, run_number, start_number, disc_simu, ref, g, sample_time, score_info, treatment, redo_number, settings, snv, rec, R, rebound_size, o, tag, cores, child_states, simulation_time_list):
+    def __init__(self, seed, mode, input_dir, run_number, start_number,
+                 disc_simu, ref, g, sample_time, score_info,
+                 treatment, redo_number, settings, snv, rec, R,
+                 rebound_size, o, tag, cores, child_states, simulation_time_list):
         self.seed = seed
         self.mode = mode
-        self.i = i
+        self.input_dir = input_dir
         self.run_number = run_number
         self.start_number = start_number
         self.disc_simu = disc_simu
@@ -94,24 +139,26 @@ class Variables:
     def job(self, simulation_time):   
         
         # create the result folder for this simulation run if not existed
-        output_folder = self.o + 'Simulation_time_' + str(simulation_time + 1) + '/' 
+        output_folder = os.path.join(self.o, f"Simulation_time_{simulation_time + 1}")
         Path(output_folder).mkdir(parents=True, exist_ok=True)
         
         # name the file with starting materials
-        sequences_file = output_folder + self.tag + '_simu' + '.fa'
+        sequences_file = os.path.join(output_folder, f"{self.tag}_simu.fa")
         
         # create Metadata file
-        Metadata_file = output_folder + 'Metadata' + '.txt'
+        Metadata_file = os.path.join(output_folder, 'Metadata.txt')
         
         # create viral loading tracking file for this simulation run
-        tracking_file = output_folder + 'VL_tracking_file' + '.csv'
+        tracking_file = os.path.join(output_folder, 'VL_tracking_file.csv')
         tracking_treatment_generation_VL = {}
         
         # generate the starting viral population
         # store it in sequences_file
         # take nots of metadate
-        initial_pop_size, concatemer, p, r, c, MB_DRM = \
-        Variables.preparation(self, simulation_time, output_folder, sequences_file, Metadata_file)
+        initial_pop_size, concatemer, p, r, c, MB_DRM = self.preparation(simulation_time,
+                                                                         output_folder,
+                                                                         sequences_file,
+                                                                         Metadata_file)
         
         # store the starting materials to "concatemer_side"
         concatemer_side = concatemer
@@ -123,48 +170,51 @@ class Variables:
         # count the number of repeat 
         redo_count = 0
         
-        while switch == False:
-            switch, progeny_pool_size_list = Variables.each_repeat(self, Metadata_file, simulation_time, output_folder, sequences_file, p, r, c, MB_DRM, redo_count, switch)
+        while not switch:
+            switch, progeny_pool_size_list = Variables.each_repeat(self, Metadata_file,
+                                                                   simulation_time, output_folder,
+                                                                   sequences_file, p, r, c, MB_DRM,
+                                                                   redo_count, switch)
             redo_count += 1
             
-            if switch == False: 
+            if not switch: 
                 # repeat
                 # rewrite starting file using the concatemer_side
-                note = 'In Round ' + str(redo_count) + \
-                ': Virus is completely suppressed in treatment ' + str(self.treatment) + \
-                ' with ' + str(progeny_pool_size_list[-1]/progeny_pool_size_list[-2])
+                note = (f"In Round {redo_count} : Virus is completely suppressed"
+                        f" in treatment {self.treatment} with"
+                        f" {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
+
                 metadata(Metadata_file, note)
-                write_file_split(concatemer = concatemer_side, \
+
+                write_file_split(concatemer = concatemer_side,
                                  output_file_path = sequences_file, tag = self.tag)
 
                 if redo_count >= self.redo_number:
-                    note = 'Virus fails to rebound in all attempts under treatment ' + str(self.treatment)
+                    note = f"Virus fails to rebound in all attempts under treatment {self.treatment}"
                     metadata(Metadata_file, note)
                     return
             
-                else: pass
-            else: pass
-            
         tracking_treatment_generation_VL[self.treatment] = progeny_pool_size_list  
         tracking(tracking_file, self.treatment, initial_pop_size, tracking_treatment_generation_VL)
-        return
     
     def preparation(self, simulation_time, output_folder, sequences_file, Metadata_file):
 
         if self.mode == 'init':
             # write all args to metadata file.
-            write_args(Metadata_file, self.R, self.run_number, self.i, \
-                       self.ref, self.snv, self.rec, self.rebound_size)
+            self.write_args(Metadata_file)
 
             # create initial viral population
-            if self.i:
+            if self.input_dir:
                 initial_pop_size = 30000
-                start_materials_fas = write_starting_pop(simulation_time, get_starting_materials(self.i), initial_pop_size, sequences_file, self.tag)
+                start_materials_fas = write_starting_pop(simulation_time, 
+                                                         get_starting_materials(self.input_dir),
+                                                         initial_pop_size,
+                                                         sequences_file,
+                                                         self.tag)
                 concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
 
-                note = 'Initial population size: ' + str(initial_pop_size)
-                metadata(Metadata_file, note)
-                note = 'Starting materials collected from file: ' + start_materials_fas
+                note = EOL.join(['Initial population size: ' + str(initial_pop_size),
+                                 'Starting materials collected from file: ' + start_materials_fas])
                 metadata(Metadata_file, note)
                 
             else:
@@ -202,7 +252,9 @@ class Variables:
 
         return initial_pop_size, concatemer, p, r, c, MB_DRM
 
-    def each_repeat(self, Metadata_file, simulation_time, output_folder, sequences_file, p, r, c, MB_DRM, redo_count, switch):
+    def each_repeat(self, Metadata_file, simulation_time, output_folder,
+                    sequences_file, p, r, c, MB_DRM, redo_count, switch):
+
         # generate random seed
         switch = False
         rng = stochastic_function(self.child_states \
@@ -263,33 +315,52 @@ class Variables:
                 # save intermediate timepoint data
                 # e.g., ./HXB2_simu_g100.fa
                 if generation % self.sample_time == 0:
-                    put_aside = output_folder + self.tag + '_simu' + \
-                    str(self.treatment) + '_g' + str(generation) + '.fa' 
-                    write_pop_file(input_file = recombined_mutated_sequences_file, \
-                                   output_file = put_aside, progeny_list = progeny_list, \
-                                   tag = self.tag)
-                else: pass
+                    put_aside = (f"{output_folder}{self.tag}_simu_"
+                                 f"{self.treatment}_g{generation}.fa")
 
+                    write_pop_file(input_file = recombined_mutated_sequences_file,
+                                   output_file = put_aside, 
+                                   progeny_list = progeny_list,
+                                   tag = self.tag)
 
         return switch, progeny_pool_size_list
+
+    
+    def write_args(self, output_file_path):
+    
+        note = EOL.join(['Settings used: ',
+                         f"Basic R : {self.R}",
+                         f"Repeat time: {self.run_number}",
+                         f"Starting materials stored in: {self.input_dir}",
+                         f"Reference: {self.ref}"
+                         f"Mutation rate: {self.snv}; Recombination rate: {self.rec}",
+                         f"Rebound size: {self.rebound_size}",
+                         f"---*---*---*---*---*---*---"])
+    
+        metadata(output_file_path, note)
 
             
 def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, c, MB_DRM, R, rng):
     
     # mutate
     mutated_sequences_file = sequences_file.split('.fa')[0] + '_ms.fa' # ./HXB2_simu_ms
-    mutator(input_file = sequences_file, output_file = mutated_sequences_file, mutation_rate = float(snv), rng = rng)
+    mutator(input_file = sequences_file,
+            output_file = mutated_sequences_file,
+            mutation_rate = float(snv),
+            rng = rng)
 
     # recombine
     if rec != 0: # perform recombine
         recombined_mutated_sequences_file = sequences_file.split('.fa')[0] + '_ms_it.fa'# ./HXB2_simu_ms_split_ms_it.fa
-        recombination(input_file = mutated_sequences_file, output_file = recombined_mutated_sequences_file, recombination_rate = float(rec), rng = rng)
+        recombination(input_file = mutated_sequences_file, output_file = recombined_mutated_sequences_file,
+                      recombination_rate = float(rec), rng = rng)
     elif rec == 0: # skep recombination process
         recombined_mutated_sequences_file = mutated_sequences_file
         
     # fitness calculation and viral replication
     df_scores = pd.read_csv(score_info)
-    progeny_list, progeny_pool_size = replication(recombined_mutated_sequences_file, ref, treatment, df_scores, p, r, c, MB_DRM, R, rng)
+    progeny_list, progeny_pool_size = replication(recombined_mutated_sequences_file, ref, treatment,
+                                                  df_scores, p, r, c, MB_DRM, R, rng)
     
     return progeny_list, progeny_pool_size, recombined_mutated_sequences_file
 
@@ -329,26 +400,20 @@ def get_fasta_seq(input_file):
     return seq
 
 def metadata(output_file_path, note):
-    f = open(output_file_path, "a+")
-    f.write(note + '\n')
-    f.close()
-    return
+    with open(output_file_path, "a+") as f:
+        f.write(note + EOL)
 
 def mutator(input_file, output_file, mutation_rate, rng):
     seq_lib = read_fasta_file(input_file)
     seq_names = list(seq_lib.keys())
 
-    open(output_file, 'w').close() # empty the previous mutated_seq_file
-    
-    f = open(output_file, "a+")
-    for seq_name in seq_names:
-        seq = seq_lib[seq_name][:].seq
-        tagline = '>' + seq_name + '\n'
-        f.write(tagline)
-        seq_mut = mutate(seq, mutation_rate, rng)
-        f.write(seq_mut + '\n')
-    f.close()
-    return
+    with open(output_file, "w") as f:
+        for seq_name in seq_names:
+            seq = seq_lib[seq_name][:].seq
+            tagline = f">{seq_name}{EOL}"
+            f.write(tagline)
+            seq_mut = mutate(seq, mutation_rate, rng)
+            f.write(seq_mut + EOL)
 
 def mutate(seq, mutation_rate, rng):
     
@@ -372,26 +437,16 @@ def mutant_sequence(seq, positions, rng):
         mut_seq = mut_seq[:pos] + alt + mut_seq[pos+1:]
     return mut_seq
     
-def random_seed_generator(seed, output_dir, total_number):
-    # generate original seed if no seed is given
-    if not seed:
-        seed = int(time.time())
-        
-    # store the seed used in each simulation run
-    seed_file = output_dir + 'SEED.txt'
-    f = open(seed_file, "w")
-    f_line = 'Seed set to ' + str(seed)
-    f.write(f_line)
-    f.close()
+def random_seed_generator(output_dir, total_number, seed=None):
 
-    # create the RNG that you want to pass around
-    rng = np.random.default_rng(seed)
-    # get the SeedSequence of the passed RNG
-    ss = rng.bit_generator._seed_seq
-    # create n initial independent states
-    child_states = ss.spawn(total_number)
-    
-    return child_states
+    seed = np.random.SeedSequence(entropy=seed)
+
+    # store the seed used in each simulation run
+    with open(os.path.join(output_dir, "SEED.txt"), "w") as f:
+        f.write(f"Seed set to {seed.entropy}{EOL}")
+
+    return seed.spawn(total_number)
+
     
 def read_fasta_file(input_file):
     seq_lib = Fasta(input_file)
@@ -413,29 +468,23 @@ def recombination(input_file, output_file, recombination_rate, rng):
         seq_to_recombine.remove(paired[0])
         seq_to_recombine.remove(paired[1])
     
-    open(output_file, 'w').close() # empty the previous mutated_seq_file
     
-    f = open(output_file, "a+")
+    with open(output_file, "w") as f:
     
-    for seq_name in seq_names_norecombine:
-        seq = seq_lib[seq_name][:].seq
-        tagline = '>' + seq_name + '\n'
-        f.write(tagline)
-        f.write(seq + '\n')
-        
-    for key, value in recombine_pairs_lib.items():
-        seq1 = seq_lib[key][:].seq
-        seq2 = seq_lib[value][:].seq
-        seq1_rec, seq2_rec = recombine(seq1, seq2, recombination_rate, rng)
-        tagline = '>' + key + '\n'
-        f.write(tagline)
-        f.write(seq1_rec + '\n')
-        tagline = '>' + value + '\n'
-        f.write(tagline)
-        f.write(seq2_rec + '\n')
-        
-    f.close()
-    return
+        for seq_name in seq_names_norecombine:
+            seq = seq_lib[seq_name][:].seq
+            f.write(f">{seq_name}{EOL}")
+            f.write(seq + EOL)
+            
+        for key, value in recombine_pairs_lib.items():
+            seq1 = seq_lib[key][:].seq
+            seq2 = seq_lib[value][:].seq
+            seq1_rec, seq2_rec = recombine(seq1, seq2, recombination_rate, rng)
+            f.write('>' + key + EOL)
+
+            f.write(seq1_rec + EOL)
+            f.write('>' + value + EOL)
+            f.write(seq2_rec + '\n')
 
 def recombine(seq1, seq2, recombination_rate, rng):
     mean = (len(seq1) -1)* recombination_rate
@@ -617,15 +666,13 @@ def write_dh_pop_file(input_file, output_file, progeny_list, progeny_pool_size, 
                 seq_list.append(line.rstrip())
                 
     read_count = 0
-    fo = open(output_file, "w")
-    for progeny in progeny_list:
-        repeat = int(rng.poisson(30000/progeny_pool_size, 1)[0])
-        for r in range(repeat):
-            fo.write('>'+ tag + '_' + str(read_count + 1) +'\n')
-            fo.write(seq_list[progeny-1] + '\n')
-            read_count += 1
-    fo.close()
-
+    with open(output_file, "w") as fo:
+        for progeny in progeny_list:
+            repeat = int(rng.poisson(30000/progeny_pool_size, 1)[0])
+            for r in range(repeat):
+                fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
+                fo.write(seq_list[progeny-1] + EOL)
+                read_count += 1
     return read_count
     
 def write_pop_file(input_file, output_file, progeny_list, tag):
@@ -637,50 +684,21 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
                 seq_list.append(line.rstrip())
                 
     read_count = 0
-    fo = open(output_file, "w")
-    for progeny in progeny_list:
-        fo.write('>'+ tag + '_' + str(read_count + 1) +'\n')
-        fo.write(seq_list[progeny-1] + '\n')
-        read_count += 1
-    fo.close()
+    with open(output_file, "w") as fo:
+        for progeny in progeny_list:
+            fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
+            fo.write(seq_list[progeny-1] + EOL)
+            read_count += 1
     return
         
-def write_args(output_file_path, R, run_number, input_dir, ref, snv, rec, rebound_size):
-
-    note = 'Settings used: '
-    metadata(output_file_path, note)
-    
-    note = 'Basic R : ' + str(R)
-    metadata(output_file_path, note)    
-    
-    note = 'Repeat time: ' + str(run_number)
-    metadata(output_file_path, note)
-    
-    note = 'Starting materials stored in: ' + str(input_dir)
-    metadata(output_file_path, note)
-    
-    note = 'Reference: ' + str(ref)
-    metadata(output_file_path, note)
-    
-    note = 'Mutation rate: ' + str(snv) + '; Recombination rate: ' + str(rec)
-    metadata(output_file_path, note)
-    
-    note = 'Rebound size: ' + str(rebound_size)
-    metadata(output_file_path, note)
-    
-    note = '---*---*---*---*---*---*---'
-    metadata(output_file_path, note)
-    
-    return
     
 def write_file_split(concatemer, output_file_path, tag):
     seq_list = concatemer.split('N' * 5)
-    f = open(output_file_path, "w")
-    for i in range(len(seq_list)):
-        f.write('>'+ tag + '_' + str(i + 1) +'\n')
-        f.write(seq_list[i] + '\n')
-    f.close()
-    return
+
+    with open(output_file_path, "w") as f:
+        for i in range(len(seq_list)):
+            f.write('>'+ tag + '_' + str(i + 1) + EOL)
+            f.write(seq_list[i] + EOL)
 
 def write_starting_pop(simulation_time, start_materials, pop_size, output_file_path, tag):
     # generate starting viral population
@@ -694,11 +712,12 @@ def write_starting_pop(simulation_time, start_materials, pop_size, output_file_p
 
     read_count = 0
     repeats = int(pop_size/len(read_list))
-    fo = open(output_file_path, "w")
-    for read in read_list:
-        for i in range(repeats):
-            fo.write('>'+ tag + '_' + str(read_count + 1) +'\n')
-            fo.write(read + '\n')
-            read_count += 1
+
+    with open(output_file_path, "w") as fo:
+        for read in read_list:
+            for i in range(repeats):
+                fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
+                fo.write(read + EOL)
+                read_count += 1
     return start_materials_fas
 
