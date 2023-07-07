@@ -222,7 +222,7 @@ class Variables:
 
             note = EOL.join(['---*---*---*---*---*---*---',
                              f'Continue the simulation on {time.strftime("%a, %d %b %Y %H:%M:%S", 
-                                                                         time.gmtime())}')]
+                                                                         time.gmtime())}'])
             metadata(Metadata_file, note)
 
             concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
