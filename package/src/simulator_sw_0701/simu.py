@@ -16,7 +16,7 @@ EOL = "\n"              # end of line terminator
 
 def simu_treated(args):   
 
-    # determine simulation run numbers: e.g., from Simulation 0 to Simulation 10
+    # determine simulation run numbers: e.g., from Simulation 1 to Simulation 10
 
     simulation_time_list = []
 
