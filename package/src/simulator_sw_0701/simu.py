@@ -10,51 +10,68 @@ import time
 import sys
 from pyfaidx import Fasta, Faidx
 
+
 EOL = "\n"              # end of line terminator
 
 
 def simu_treated(args):   
 
     # determine simulation run numbers: e.g., from Simulation 1 to Simulation 10
-    if not args.disc_simu:
-        simulation_time_list = [i for i in range(args.start_number - 1, \
-        args.start_number - 1 + args.run_number)]
-    else:
+
+    simulation_time_list = []
+
+    # protect against negative start_number and run_number
+    if (args.disc_simu is None
+        and args.start_number >= 0
+        and args.run_number > 0):
+
+        for i in range(args.start_number, args.start_number + args.run_number):
+            simulation_time_list.append(i)
+
+    elif os.path.exists(args.disc_simu):
+
         with open(args.disc_simu,'r') as f:
-            simulation_time_list = [int(i)-1 for i in f.readline().rstrip().rsplit(', ')]
-                                         
-    # create the result folder if not existed
-    if args.o[-1] != '/':
-        args.o += '/'
+
+            for tline in f:
+                tline = tline.split(",")[0].strip()
+
+                simulation_time_list.append(int(tline))
+
+    else:
+        raise ValueError("Invalid disc_simu, start_number or run_number")
 
     Path(args.o).mkdir(parents=True, exist_ok=True)                                      
                                         
     # generate random independent seed for each simulation run
-    child_states = random_seed_generator(args.o, args.run_number *  args.redo_number, seed=args.seed)
+    child_states = random_seed_generator(args.o,
+                                         args.run_number *  args.redo_number,
+                                         seed=args.seed)
 
     # store all arguments
     # save space for child_states and simulation_time_list
-    simu_var = Variables(args.seed, args.mode, args.i, args.run_number, args.start_number, \
-                         args.disc_simu, args.ref, args.g, args.sample_time, \
-                         args.score_info, args.treatment, args.redo_number, args.settings, \
-                         args.snv, args.rec, args.R, args.rebound_size, args.o, args.tag, \
+    simu_var = Variables(args.seed, args.mode, args.input_dir, args.run_number, args.start_number,
+                         args.disc_simu, args.ref, args.g, args.sample_time,
+                         args.score_info, args.treatment, args.redo_number, args.settings,
+                         args.snv, args.rec, args.R, args.rebound_size, args.o, args.tag,
                          args.cores, child_states, simulation_time_list)
 
     Parallel(n_jobs = simu_var.cores)\
     (delayed(simu_var.job)(simulation_time) for simulation_time in simulation_time_list)
     
+
 def concatemer_sepNs(input_file_path):
     # concatenate all seq in a multi-FASTA file
     con_seq = ''
-    count_seq = 0
+    num_of_n_repeat = 5
     
     with open(input_file_path, 'r') as f:
-        for line in f:
+        for count_seq, line in enumerate(f):
             if '>' not in line:
                 con_seq += line.rstrip()
-                con_seq += 'N' * 5
-                count_seq += 1
+                con_seq += 'N' * num_of_n_repeat
+
     return (con_seq[:-5]), count_seq
+
     
 def codon_lib_generator():
     Base1_list = ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T',
@@ -86,15 +103,16 @@ def codon_lib_generator():
         codon_lib[codon] = AA_list[i]
     return codon_lib
     
+
 class Variables:
         
-    def __init__(self, seed, mode, i, run_number, start_number,
+    def __init__(self, seed, mode, input_dir, run_number, start_number,
                  disc_simu, ref, g, sample_time, score_info,
                  treatment, redo_number, settings, snv, rec, R,
                  rebound_size, o, tag, cores, child_states, simulation_time_list):
         self.seed = seed
         self.mode = mode
-        self.i = i
+        self.input_dir = input_dir
         self.run_number = run_number
         self.start_number = start_number
         self.disc_simu = disc_simu
@@ -180,14 +198,16 @@ class Variables:
 
         if self.mode == 'init':
             # write all args to metadata file.
-            write_args(Metadata_file, self.R, self.run_number, self.i, \
-                       self.ref, self.snv, self.rec, self.rebound_size)
+            self.write_args(Metadata_file)
 
             # create initial viral population
-            if self.i:
+            if self.input_dir:
                 initial_pop_size = 30000
-                start_materials_fas = write_starting_pop(simulation_time, get_starting_materials(self.i),
-                                                         initial_pop_size, sequences_file, self.tag)
+                start_materials_fas = write_starting_pop(simulation_time, 
+                                                         get_starting_materials(self.input_dir),
+                                                         initial_pop_size,
+                                                         sequences_file,
+                                                         self.tag)
                 concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
 
                 note = EOL.join(['Initial population size: ' + str(initial_pop_size),
@@ -302,12 +322,29 @@ class Variables:
 
         return switch, progeny_pool_size_list
 
+    
+    def write_args(self, output_file_path):
+    
+        note = EOL.join(['Settings used: ',
+                         f"Basic R : {self.R}",
+                         f"Repeat time: {self.run_number}",
+                         f"Starting materials stored in: {self.input_dir}",
+                         f"Reference: {self.ref}"
+                         f"Mutation rate: {self.snv}; Recombination rate: {self.rec}",
+                         f"Rebound size: {self.rebound_size}",
+                         f"---*---*---*---*---*---*---"])
+    
+        metadata(output_file_path, note)
+
             
 def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, c, MB_DRM, R, rng):
     
     # mutate
     mutated_sequences_file = sequences_file.split('.fa')[0] + '_ms.fa' # ./HXB2_simu_ms
-    mutator(input_file = sequences_file, output_file = mutated_sequences_file, mutation_rate = float(snv), rng = rng)
+    mutator(input_file = sequences_file,
+            output_file = mutated_sequences_file,
+            mutation_rate = float(snv),
+            rng = rng)
 
     # recombine
     if rec != 0: # perform recombine
@@ -406,6 +443,7 @@ def random_seed_generator(output_dir, total_number, seed=None):
         f.write(f"Seed set to {seed.entropy}{EOL}")
 
     return seed.spawn(total_number)
+
     
 def read_fasta_file(input_file):
     seq_lib = Fasta(input_file)
@@ -650,18 +688,6 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
             read_count += 1
     return
         
-def write_args(output_file_path, R, run_number, input_dir, ref, snv, rec, rebound_size):
-
-    note = EOL.join(['Settings used: ',
-                     'Basic R : ' + str(R),
-                     'Repeat time: ' + str(run_number),
-                     'Starting materials stored in: ' + str(input_dir),
-                     'Reference: ' + str(ref),
-                     'Mutation rate: ' + str(snv) + '; Recombination rate: ' + str(rec),
-                     'Rebound size: ' + str(rebound_size),
-                     '---*---*---*---*---*---*---'])
-
-    metadata(output_file_path, note)
     
 def write_file_split(concatemer, output_file_path, tag):
     seq_list = concatemer.split('N' * 5)
