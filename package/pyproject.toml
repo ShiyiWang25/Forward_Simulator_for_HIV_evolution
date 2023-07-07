@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "simulator_sw_0701"
-version = "0.0.5"
+version = "0.0.8"
 authors = [
     {name = "Shiyi Wang", email = "syiwang@uw.edu"},
 ]
