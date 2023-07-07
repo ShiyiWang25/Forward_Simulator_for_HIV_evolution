@@ -16,6 +16,7 @@ def _parse_args(args, **kwargs):
                         choices=['init', 'cont'],
                         help='select mode between initiation (init) and continue (cont)')
     parser.add_argument('-i',
+                        dest = "input_dir",
                         type=str,
                         help='the directory of Fasta files with starting materials')
     parser.add_argument('--run_number',
