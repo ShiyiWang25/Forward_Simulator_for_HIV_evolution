@@ -79,5 +79,5 @@ def _parse_args(args, **kwargs):
                         default = 1,
                         type=int,
                         help='Core number to use.')
-    
+
     return parser.parse_args(args)
