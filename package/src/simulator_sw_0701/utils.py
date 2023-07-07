@@ -22,7 +22,7 @@ def _parse_args(args, **kwargs):
                         default = 1,
                         type=int, help='define the number of simulations to run.')
     parser.add_argument('--start_number',
-                        default = 1,
+                        default = 0,
                         type=int,
                         help='define the repeat number of the first simulation to run.')
     parser.add_argument('--disc_simu',
