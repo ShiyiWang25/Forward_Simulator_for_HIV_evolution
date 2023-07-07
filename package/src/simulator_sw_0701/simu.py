@@ -33,6 +33,9 @@ def simu_treated(args):
         with open(args.disc_simu,'r') as f:
 
             for tline in f:
+                # TODO: it wasn't clear to me in the code which item in the string
+                # split was desired.  I used 0 as a place holder, but this should be
+                # validated by Shiyi.
                 tline = tline.split(",")[0].strip()
 
                 simulation_time_list.append(int(tline))
