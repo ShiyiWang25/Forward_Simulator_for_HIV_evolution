@@ -22,10 +22,10 @@ def simu_treated(args):
 
     # protect against negative start_number and run_number
     if (args.disc_simu is None
-        and args.start_number >= 0
+        and args.start_number >= 1
         and args.run_number > 0):
 
-        for i in range(args.start_number, args.start_number + args.run_number):
+        for i in range(args.start_number - 1, args.start_number - 1 + args.run_number):
             simulation_time_list.append(i)
 
     elif os.path.exists(args.disc_simu):
@@ -35,7 +35,7 @@ def simu_treated(args):
             for tline in f:
                 tline = tline.strip()
 
-                simulation_time_list.append(int(tline))
+                simulation_time_list.append(int(tline) - 1)
 
     else:
         raise ValueError("Invalid disc_simu, start_number or run_number")
