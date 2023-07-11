@@ -16,16 +16,16 @@ EOL = "\n"              # end of line terminator
 
 def simu_treated(args):   
 
-    # determine simulation run numbers: e.g., from Simulation 0 to Simulation 10
+    # determine simulation run numbers: e.g., from Simulation 1 to Simulation 10
 
     simulation_time_list = []
 
     # protect against negative start_number and run_number
     if (args.disc_simu is None
-        and args.start_number >= 0
+        and args.start_number >= 1
         and args.run_number > 0):
 
-        for i in range(args.start_number, args.start_number + args.run_number):
+        for i in range(args.start_number - 1, args.start_number - 1 + args.run_number):
             simulation_time_list.append(i)
 
     elif os.path.exists(args.disc_simu):
@@ -33,19 +33,16 @@ def simu_treated(args):
         with open(args.disc_simu,'r') as f:
 
             for tline in f:
-                # TODO: it wasn't clear to me in the code which item in the string
-                # split was desired.  I used 0 as a place holder, but this should be
-                # validated by Shiyi.
-                tline = tline.split(",")[0].strip()
+                tline = tline.strip()
 
-                simulation_time_list.append(int(tline))
+                simulation_time_list.append(int(tline) - 1)
 
     else:
         raise ValueError("Invalid disc_simu, start_number or run_number")
 
     Path(args.o).mkdir(parents=True, exist_ok=True)                                      
                                         
-    # generate random independent seed for each simulation run
+    # generate a random independent seed for each simulation run
     child_states = random_seed_generator(args.o,
                                          args.run_number *  args.redo_number,
                                          seed=args.seed)
@@ -145,16 +142,16 @@ class Variables:
         # name the file with starting materials
         sequences_file = os.path.join(output_folder, f"{self.tag}_simu.fa")
         
-        # create Metadata file
+        # create a Metadata file
         Metadata_file = os.path.join(output_folder, 'Metadata.txt')
         
-        # create viral loading tracking file for this simulation run
+        # create a viral loading tracking file for this simulation run
         tracking_file = os.path.join(output_folder, 'VL_tracking_file.csv')
         tracking_treatment_generation_VL = {}
         
         # generate the starting viral population
         # store it in sequences_file
-        # take nots of metadate
+        # take notes of metadata
         initial_pop_size, concatemer, p, r, c, MB_DRM = self.preparation(simulation_time,
                                                                          output_folder,
                                                                          sequences_file,
@@ -164,10 +161,10 @@ class Variables:
         concatemer_side = concatemer
         
         # perform the simulation for redo_number times unless reaching rebound
-        # define the pointer to decide whether to continously repeat the simulation run
+        # define the pointer to decide whether to continuously repeat the simulation run
         switch = False
         
-        # count the number of repeat 
+        # count the number of repeats 
         redo_count = 0
         
         while not switch:
@@ -200,10 +197,10 @@ class Variables:
     def preparation(self, simulation_time, output_folder, sequences_file, Metadata_file):
 
         if self.mode == 'init':
-            # write all args to metadata file.
+            # write all args to the metadata file.
             self.write_args(Metadata_file)
 
-            # create initial viral population
+            # create an initial viral population
             if self.input_dir:
                 initial_pop_size = 30000
                 start_materials_fas = write_starting_pop(simulation_time, 
@@ -213,8 +210,8 @@ class Variables:
                                                          self.tag)
                 concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
 
-                note = EOL.join(['Initial population size: ' + str(initial_pop_size),
-                                 'Starting materials collected from file: ' + start_materials_fas])
+                note = EOL.join([f"Initial population size: {initial_pop_size}",
+                                 f"Starting materials collected from file: {start_materials_fas}"])
                 metadata(Metadata_file, note)
                 
             else:
@@ -223,9 +220,8 @@ class Variables:
 
         elif self.mode == 'cont':
 
-            note = '---*---*---*---*---*---*---'
-            metadata(Metadata_file, note)  
-            note = 'Continue the simulation on' + time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
+            note = EOL.join(['---*---*---*---*---*---*---',
+                             f'Continue the simulation on {time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())}'])
             metadata(Metadata_file, note)
 
             concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
@@ -233,9 +229,9 @@ class Variables:
         if self.settings:
             with open(self.settings,'r') as f:
                 p, r, c, MB_DRM = [float(i) for i in f.readline().rstrip().rsplit(', ')]
-            note = 'Settings: p, r, c, MB_DRM'
-            metadata(Metadata_file, note)       
-            note = 'Settings: ' + str(p) + ', ' +  str(r) + ', ' + str(c) + ', ' + str(MB_DRM)
+  
+            note = EOL.join(['Settings: p, r, c, MB_DRM',
+                             f"Settings: {p}, {r}, {c}, {MB_DRM}"])
             metadata(Metadata_file, note)
         else:
             print('Error: missing setting information.')
@@ -255,41 +251,42 @@ class Variables:
     def each_repeat(self, Metadata_file, simulation_time, output_folder,
                     sequences_file, p, r, c, MB_DRM, redo_count, switch):
 
-        # generate random seed
+        # generate a random seed
         switch = False
-        rng = stochastic_function(self.child_states \
-                                  [self.simulation_time_list.index(simulation_time) * \
-                                   self.redo_number + redo_count])
+        rng = stochastic_function(self.child_states 
+                                  [self.simulation_time_list.index(simulation_time) * 
+                                  self.redo_number + redo_count])
         
         progeny_pool_size_list = [] 
 
         # simulate in g generations until a viral rebound or suppression is achieved
         for generation in range(1, self.g + 1):
-            progeny_list, progeny_pool_size, recombined_mutated_sequences_file = \
-            each_generation(sequences_file, self.snv, self.rec, self.score_info, \
-                            self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng)
+            progeny_list, progeny_pool_size, recombined_mutated_sequences_file = (
+                each_generation(sequences_file, self.snv, self.rec, self.score_info, 
+                                self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng))
             progeny_pool_size_list.append(progeny_pool_size)
-            note = str(generation) + ':' + str(progeny_pool_size)
+            note = f"{generation}: {progeny_pool_size}"
             metadata(Metadata_file, note)
 
             # check
-            if len(progeny_pool_size_list) >= 3 and progeny_pool_size < 100 and \
-            progeny_pool_size_list[-2] < 100 and progeny_pool_size_list[-3] < 100:
+            if (len(progeny_pool_size_list) >= 3 and progeny_pool_size < 100 and 
+                progeny_pool_size_list[-2] < 100 and progeny_pool_size_list[-3] < 100):
                 break
 
-            elif len(progeny_pool_size_list) >= 3 and \
-            progeny_pool_size > self.rebound_size and \
-            progeny_pool_size_list[-1] > progeny_pool_size_list[-2] and \
-            progeny_pool_size_list[-2] > progeny_pool_size_list[-3]:
-                note = 'In treatment ' + str(self.treatment) + \
-                ': Virus rebound at generation ' + str(generation) + \
-                ' with ' + str(progeny_pool_size_list[-1]/progeny_pool_size_list[-2])
+            elif (len(progeny_pool_size_list) >= 3 and 
+                  progeny_pool_size > self.rebound_size and 
+                  progeny_pool_size_list[-1] > progeny_pool_size_list[-2] and 
+                  progeny_pool_size_list[-2] > progeny_pool_size_list[-3]):
+                note = (f"In treatment {self.treatment}:"
+                        f" Virus rebound at generation {generation}"
+                        f" with {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
                 metadata(Metadata_file, note)
 
                 # save the rebound viral population
                 # e.g., ./HXB2_simu_g100_rebound.fa
-                rebound_pop_file = output_folder + self.tag + '_simu_' + \
-                str(self.treatment) + '_g' + str(generation) + '_rebound.fa' 
+                rebound_pop_file = os.path.join(output_folder, 
+                                                f"{self.tag}_simu_{self.treatment}_"
+                                                f"g{generation}_rebound.fa")
                 write_pop_file(input_file = recombined_mutated_sequences_file, \
                                output_file = rebound_pop_file, progeny_list = progeny_list, \
                                tag = self.tag)
@@ -315,9 +312,9 @@ class Variables:
                 # save intermediate timepoint data
                 # e.g., ./HXB2_simu_g100.fa
                 if generation % self.sample_time == 0:
-                    put_aside = (f"{output_folder}{self.tag}_simu_"
-                                 f"{self.treatment}_g{generation}.fa")
-
+                    put_aside = os.path.join(output_folder, 
+                                             f"{self.tag}_simu_{self.treatment}_"
+                                             f"g{generation}.fa")
                     write_pop_file(input_file = recombined_mutated_sequences_file,
                                    output_file = put_aside, 
                                    progeny_list = progeny_list,
@@ -343,18 +340,21 @@ class Variables:
 def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, c, MB_DRM, R, rng):
     
     # mutate
-    mutated_sequences_file = sequences_file.split('.fa')[0] + '_ms.fa' # ./HXB2_simu_ms
+    # ./HXB2_simu_ms
+    mutated_sequences_file = f"{sequences_file.split('.fa')[0]}__ms.fa"
     mutator(input_file = sequences_file,
             output_file = mutated_sequences_file,
             mutation_rate = float(snv),
             rng = rng)
 
     # recombine
+    # ./HXB2_simu_ms_split_ms_it.fa
     if rec != 0: # perform recombine
-        recombined_mutated_sequences_file = sequences_file.split('.fa')[0] + '_ms_it.fa'# ./HXB2_simu_ms_split_ms_it.fa
+        recombined_mutated_sequences_file = (f"{sequences_file.split('.fa')[0]}_"
+                                             f"ms_it.fa")
         recombination(input_file = mutated_sequences_file, output_file = recombined_mutated_sequences_file,
                       recombination_rate = float(rec), rng = rng)
-    elif rec == 0: # skep recombination process
+    elif rec == 0: # skep the recombination process
         recombined_mutated_sequences_file = mutated_sequences_file
         
     # fitness calculation and viral replication
@@ -481,10 +481,9 @@ def recombination(input_file, output_file, recombination_rate, rng):
             seq2 = seq_lib[value][:].seq
             seq1_rec, seq2_rec = recombine(seq1, seq2, recombination_rate, rng)
             f.write('>' + key + EOL)
-
             f.write(seq1_rec + EOL)
             f.write('>' + value + EOL)
-            f.write(seq2_rec + '\n')
+            f.write(seq2_rec + EOL)
 
 def recombine(seq1, seq2, recombination_rate, rng):
     mean = (len(seq1) -1)* recombination_rate
