@@ -29,7 +29,7 @@ This individual virus-based forward simulator is written in _Python_.
 
 To install this script with its dependencies, run the following command in your command line:
 ```
-pip install simulator-sw-0701==0.0.8 --extra-index-url=https://test.pypi.org/simple/
+pip install simulator-sw-0701==0.0.10 --extra-index-url=https://test.pypi.org/simple/
 ```
 
 Alternative way:
