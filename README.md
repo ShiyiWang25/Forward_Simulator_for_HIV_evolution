@@ -32,6 +32,13 @@ To install this script with its dependencies, run the following command in your 
 pip install simulator-sw-0701==0.0.8 --extra-index-url=https://test.pypi.org/simple/
 ```
 
+Alternative way:
+```
+python -m venv env
+source env/bin/activate
+python -m pip install git+https://github.com/ShiyiWang25/202306_Simulator.git@new_interface
+```
+
 The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/) using the following link: [simulator-sw-0701 0.0.8](https://test.pypi.org/project/simulator-sw-0701/0.0.8/)
 
 ## python_requires = >= 3.9
