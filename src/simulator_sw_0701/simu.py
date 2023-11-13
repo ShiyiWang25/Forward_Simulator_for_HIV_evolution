@@ -543,7 +543,7 @@ def R_calculation(drug, seq, ref_sequence, df_scores, p, r, c, MB_DRM, R0):
     else:
         x = neDRM * r - MB_DRM * len(DRMs) + sum(list(DRM_CM_lib.values()))*c - MB_DRM/10 * len(mutations)
 
-    R = R_cal(x, p)
+    R = R_cal(R0, x, p)
 
     return R
 
