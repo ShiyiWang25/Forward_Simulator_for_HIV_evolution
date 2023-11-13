@@ -458,7 +458,7 @@ def recombination(input_file, output_file, recombination_rate, rng):
     
     # pick 20% of the sequences to recombine
     seq_to_recombine = list(rng.choice(seq_names, int(len(seq_names)/6), replace=False))
-    seq_names_norecombine = list(set(seq_names) - set(seq_to_recombine))
+    seq_names_norecombine = sorted(list(set(seq_names) - set(seq_to_recombine)))
     
     recombine_pairs_lib = {}
     # pair
