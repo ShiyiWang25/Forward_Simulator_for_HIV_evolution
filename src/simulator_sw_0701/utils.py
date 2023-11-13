@@ -1,6 +1,5 @@
 import argparse
 
-
 def _parse_args(args, **kwargs):
 
     parser = argparse.ArgumentParser(
@@ -37,7 +36,7 @@ def _parse_args(args, **kwargs):
                         type=int,
                         help='define the number of generations.')
     parser.add_argument('--sample_time',
-                        default = 5,
+                        default = 10,
                         type=int,
                         help='store viral population information every x generations.')
     parser.add_argument('--score_info',
@@ -66,7 +65,7 @@ def _parse_args(args, **kwargs):
                         type=float,
                         help='define the basic reproductive number.')
     parser.add_argument('--rebound_size',
-                        default = 500,
+                        default = 30000,
                         type=int,
                         help='Define the VL to define a rebound.')
     parser.add_argument('-o',

@@ -62,14 +62,13 @@ def simu_treated(args):
 def concatemer_sepNs(input_file_path):
     # concatenate all seq in a multi-FASTA file
     con_seq = ''
-    num_of_n_repeat = 5
-    
+    count_seq = 0
     with open(input_file_path, 'r') as f:
-        for count_seq, line in enumerate(f):
+        for line in f:
             if '>' not in line:
                 con_seq += line.rstrip()
-                con_seq += 'N' * num_of_n_repeat
-
+                con_seq += 'N' * 5
+                count_seq += 1
     return (con_seq[:-5]), count_seq
 
     
@@ -238,10 +237,11 @@ class Variables:
             sys.exit()
 
         if self.treatment:
-            note = 'Treatment:' + str(self.treatment)
-            metadata(Metadata_file, note)  
-            note = '---*---*---*---*---*---*---'
-            metadata(Metadata_file, note)     
+            note = EOL.join([
+            f"Treatment: {self.treatment}",
+            f"---*---*---*---*---*---*---{EOL}"
+            ])
+            metadata(Metadata_file, note)       
         else:
             print('Error: missing treatment information.')
             sys.exit()
@@ -265,8 +265,8 @@ class Variables:
                 each_generation(sequences_file, self.snv, self.rec, self.score_info, 
                                 self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng))
             progeny_pool_size_list.append(progeny_pool_size)
-            note = f"{generation}: {progeny_pool_size}"
-            metadata(Metadata_file, note)
+            metadata(Metadata_file, 
+            		 f"{generation}: {progeny_pool_size}")
 
             # check
             if (len(progeny_pool_size_list) >= 3 and progeny_pool_size < 100 and 
@@ -277,18 +277,19 @@ class Variables:
                   progeny_pool_size > self.rebound_size and 
                   progeny_pool_size_list[-1] > progeny_pool_size_list[-2] and 
                   progeny_pool_size_list[-2] > progeny_pool_size_list[-3]):
-                note = (f"In treatment {self.treatment}:"
-                        f" Virus rebound at generation {generation}"
-                        f" with {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
-                metadata(Metadata_file, note)
+                metadata(Metadata_file, 
+                		(f"In treatment {self.treatment}:"
+                         f" Virus rebound at generation {generation}"
+                         f" with {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}"))
 
                 # save the rebound viral population
                 # e.g., ./HXB2_simu_g100_rebound.fa
                 rebound_pop_file = os.path.join(output_folder, 
                                                 f"{self.tag}_simu_{self.treatment}_"
                                                 f"g{generation}_rebound.fa")
-                write_pop_file(input_file = recombined_mutated_sequences_file, \
-                               output_file = rebound_pop_file, progeny_list = progeny_list, \
+                write_pop_file(input_file = recombined_mutated_sequences_file, 
+                               output_file = rebound_pop_file, 
+                               progeny_list = progeny_list, 
                                tag = self.tag)
                 switch = True            
                 break
@@ -297,17 +298,20 @@ class Variables:
                 # set a pseudo drug-holiday at generation 14
                 # amplify the population size to 30,000
                 if generation == 14:
-                    new_progeny_pool_size = write_dh_pop_file(input_file = recombined_mutated_sequences_file, \
-                                                              output_file = sequences_file, \
-                                                              progeny_list = progeny_list, \
-                                                              progeny_pool_size = progeny_pool_size, tag = self.tag)
+                    new_progeny_pool_size = write_dh_pop_file(
+                        input_file = recombined_mutated_sequences_file, 
+                        output_file = sequences_file, 
+                        progeny_list = progeny_list, 
+                        progeny_pool_size = progeny_pool_size, 
+                        tag = self.tag)
                     progeny_pool_size_list[-1] = new_progeny_pool_size  
                 else:
                     # generate the progeny population
                     # ATTENTION: output file will cover the previous concatemer_output file
-                    write_pop_file(input_file = recombined_mutated_sequences_file, \
-                                   output_file = sequences_file, \
-                                   progeny_list = progeny_list, tag = self.tag)
+                    write_pop_file(input_file = recombined_mutated_sequences_file, 
+                                   output_file = sequences_file, 
+                                   progeny_list = progeny_list, 
+                                   tag = self.tag)
 
                 # save intermediate timepoint data
                 # e.g., ./HXB2_simu_g100.fa
@@ -352,15 +356,20 @@ def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, 
     if rec != 0: # perform recombine
         recombined_mutated_sequences_file = (f"{sequences_file.split('.fa')[0]}_"
                                              f"ms_it.fa")
-        recombination(input_file = mutated_sequences_file, output_file = recombined_mutated_sequences_file,
-                      recombination_rate = float(rec), rng = rng)
+        recombination(input_file = mutated_sequences_file, 
+                      output_file = recombined_mutated_sequences_file,
+                      recombination_rate = float(rec), 
+                      rng = rng)
     elif rec == 0: # skep the recombination process
         recombined_mutated_sequences_file = mutated_sequences_file
         
     # fitness calculation and viral replication
     df_scores = pd.read_csv(score_info)
-    progeny_list, progeny_pool_size = replication(recombined_mutated_sequences_file, ref, treatment,
-                                                  df_scores, p, r, c, MB_DRM, R, rng)
+    progeny_list, progeny_pool_size = replication(recombined_mutated_sequences_file, 
+                                                  ref, treatment,
+                                                  df_scores, 
+                                                  p, r, c, MB_DRM, 
+                                                  R, rng)
     
     return progeny_list, progeny_pool_size, recombined_mutated_sequences_file
 
@@ -410,10 +419,11 @@ def mutator(input_file, output_file, mutation_rate, rng):
     with open(output_file, "w") as f:
         for seq_name in seq_names:
             seq = seq_lib[seq_name][:].seq
-            tagline = f">{seq_name}{EOL}"
-            f.write(tagline)
             seq_mut = mutate(seq, mutation_rate, rng)
-            f.write(seq_mut + EOL)
+            f.write(EOL.join([
+                f">{seq_name}",
+                f"{seq_mut}{EOL}"
+            ]))
 
 def mutate(seq, mutation_rate, rng):
     
@@ -458,7 +468,7 @@ def recombination(input_file, output_file, recombination_rate, rng):
     
     # pick 20% of the sequences to recombine
     seq_to_recombine = list(rng.choice(seq_names, int(len(seq_names)/6), replace=False))
-    seq_names_norecombine = list(set(seq_names) - set(seq_to_recombine))
+    seq_names_norecombine = sorted(list(set(seq_names) - set(seq_to_recombine)))
     
     recombine_pairs_lib = {}
     # pair
@@ -473,17 +483,21 @@ def recombination(input_file, output_file, recombination_rate, rng):
     
         for seq_name in seq_names_norecombine:
             seq = seq_lib[seq_name][:].seq
-            f.write(f">{seq_name}{EOL}")
-            f.write(seq + EOL)
+            f.write(EOL.join([
+                f">{seq_name}",
+                f"{seq}{EOL}"
+            ]))
             
         for key, value in recombine_pairs_lib.items():
             seq1 = seq_lib[key][:].seq
             seq2 = seq_lib[value][:].seq
             seq1_rec, seq2_rec = recombine(seq1, seq2, recombination_rate, rng)
-            f.write('>' + key + EOL)
-            f.write(seq1_rec + EOL)
-            f.write('>' + value + EOL)
-            f.write(seq2_rec + EOL)
+            f.write(EOL.join([
+                f">{key}",
+                f"{seq1_rec}",
+                f">{value}",
+                f"{seq2_rec}{EOL}",
+            ]))
 
 def recombine(seq1, seq2, recombination_rate, rng):
     mean = (len(seq1) -1)* recombination_rate
@@ -499,9 +513,9 @@ def recombine(seq1, seq2, recombination_rate, rng):
 def R_cal(R0, x, p):
     
     if p == 0:
-        R = R0 * 2/(1+np.e**(-x))
+        R = R0 * 2/(1+e**(-x))
     else:
-        R = R0 * 2/(1+np.e**(p-x))
+        R = R0 * 2/(1+e**(p-x))
         
     return R
 
@@ -518,14 +532,10 @@ def R_calculation(drug, seq, ref_sequence, df_scores, p, r, c, MB_DRM, R0):
     for DRM in DRMs:
         pCMs = df_scores['CM'].tolist()[pDRMs.index(DRM)][2:-2].split("', '") # possible CMs
         CMs_number = len(set(mutations).intersection(set(pCMs))) # CMs in target sequence
-        if CMs_number > 1:
-            DRM_CM_lib[DRM] = 1
-        else:
-            DRM_CM_lib[DRM] = CMs_number
+        DRM_CM_lib[DRM] = CMs_number
         if df_scores[drug].tolist()[pDRMs.index(DRM)] == 1:
             neDRM = 1
         else: pass
-
 
     x = 0
     if p == 0:
@@ -533,8 +543,7 @@ def R_calculation(drug, seq, ref_sequence, df_scores, p, r, c, MB_DRM, R0):
     else:
         x = neDRM * r - MB_DRM * len(DRMs) + sum(list(DRM_CM_lib.values()))*c - MB_DRM/10 * len(mutations)
 
-    
-    R = R_cal(R0, x, p)
+    R = R_cal(x, p)
 
     return R
 
@@ -548,7 +557,7 @@ def replication(input_file_path, ref_sequence, drug, df_scores, p, r, c, MB_DRM,
     progeny_number = 0
     progeny_number_list = [] # store the progeny number for each seq
     
-    progeny_pool_size = 0 # store the total progeny number in the newly generated population
+    progeny_pool_size = 0 # store total progeny number in the newly generated population
     
     progeny_list = []
     
@@ -711,12 +720,13 @@ def write_starting_pop(simulation_time, start_materials, pop_size, output_file_p
 
     read_count = 0
     repeats = int(pop_size/len(read_list))
-
     with open(output_file_path, "w") as fo:
         for read in read_list:
             for i in range(repeats):
-                fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
-                fo.write(read + EOL)
+                fo.write(EOL.join([
+                    f">{tag}_{read_count + 1}",
+                    f"{read}{EOL}"
+                ]))
                 read_count += 1
     return start_materials_fas
 
