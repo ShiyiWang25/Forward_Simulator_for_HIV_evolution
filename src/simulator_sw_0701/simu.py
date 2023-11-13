@@ -1,14 +1,22 @@
+"""
+Shiyi Wang
+Last Modified: 11-13-2023 3:37 PM
+"""
+
 import argparse
 import os
 import numpy as np
 import pandas as pd
 import pysam
+import math
+from math import e
 from pysam import FastaFile
 from pathlib import Path
 from joblib import Parallel, delayed
 import time
 import sys
 from pyfaidx import Fasta, Faidx
+
 
 
 EOL = "\n"              # end of line terminator
