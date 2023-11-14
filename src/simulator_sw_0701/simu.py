@@ -354,7 +354,7 @@ def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, 
     
     # mutate
     # ./HXB2_simu_ms
-    mutated_sequences_file = f"{sequences_file.split('.fa')[0]}__ms.fa"
+    mutated_sequences_file = f"{sequences_file.split('.fa')[0]}_ms.fa"
     mutator(input_file = sequences_file,
             output_file = mutated_sequences_file,
             mutation_rate = float(snv),
