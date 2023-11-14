@@ -19,7 +19,7 @@ This individual virus-based forward simulator is written in _Python_.
   * In each generation, individual genomes go through 4 steps sequentially: mutation, recombination, fitness calculation, and replication.
   
 * The simulator stops in either of the 2 conditions (Figure B):
-  1. Simulated viral rebound: the size of the simulated population exceed a given threshold, e.g., 150,000 genomes
+  1. Simulated viral rebound: the size of the simulated population exceeds a given threshold, e.g., 30,000 genomes
   2. Simulated viral suppression: the size of the simulated population is continuously lower than a given threshold, e.g., 100 genomes, for at least 3 generations.
   
 * We designed linkages by generating co-variant mutation pairs composed of synthetic DRM and synthetic compensatory mutations in a 1-to-1 relationship.
@@ -29,17 +29,10 @@ This individual virus-based forward simulator is written in _Python_.
 
 To install this script with its dependencies, run the following command in your command line:
 ```
-pip install simulator-sw-0701==0.0.10 --extra-index-url=https://test.pypi.org/simple/
-```
-
-Alternative way:
-```
 python -m venv env
 source env/bin/activate
 python -m pip install git+https://github.com/ShiyiWang25/202306_Simulator.git@new_interface
 ```
-
-The latest script in construction can be viewed on [TestPyPI](https://test.pypi.org/project/pysam/) using the following link: [simulator-sw-0701 0.0.8](https://test.pypi.org/project/simulator-sw-0701/0.0.8/)
 
 ## python_requires = >= 3.9
 ## Dependencies
@@ -52,37 +45,49 @@ The latest script in construction can be viewed on [TestPyPI](https://test.pypi.
 ## Test
 The test folder provides some basic materials to perform a test run using this script. The materials provided are:
 1. The reference protease sequences (or the 'wild-type' protease sequence): HXB2_PR.fa
-   - all synthetic sequences generated will be aligned to this reference sequence, based on the alignment results their fitness will be determined
-2. Synthetic Drug-Resistance and compensatory mutation pairs stored in one CSV file: score_system.csv
-   - 8 synthetic drug pressure are provided, named from A to H
-   - for each synthetic drug pressure, 3 pairs of synthetic mutation pairs are assigned
+   - all synthetic sequences generated will be aligned to this reference sequence. The alignment results determine their fitness.
+2. Synthetic drug resistance and compensatory mutation pairs are stored in one CSV file: Pathways_5.csv.
+   - for each synthetic drug pressure named 'A', 5 pairs of synthetic mutation pairs are assigned.
 3. The values for variables used in this simulator: settings.txt
-4. Eleven different viral populations for performing 11 independent simulation runs:
-   - each viral population has 30,000 synthetic Drug-Naive protease sequences
+4. Ten different synthetic drug-naive viral populations for performing up to 10 independent simulation runs:
+   - each FASTA file has 30,000 synthetic HIV drug-naive protease sequences.
+   - these files are generated with drug pressure turned off. The simulator algorithm used will be uploaded soon.
   
-In the Test folder, run the following command line to initiate 3 independent simulation runs.
+The following command line will initiate 3 independent simulation runs.
 This test will stop in minutes as only 5 generations are allowed in each simulation run. The simulation outputs will be saved in `output/Simulation_time_1`, `output/Simulation_time_2`, and `output/Simulation_time_3`.
 
 ```
-python3 -m simulator_sw_0701 -i start_materials/ \
---run_number 3 --ref HXB2_PR.fa --score_info score_system.csv \
---treatment A --settings settings.txt -o ./output --tag test \
---cores 3 --mode init -g 5 --rebound_size 100000
+python3 -m simulator_sw_0701 \
+--seed 2023 \
+--mode init \
+-i ./test/start_materials \
+--run_number 3 \
+--ref ./test/HXB2_PR.fa \
+-g 5 \
+--sample_time 10 \
+--score_info ./test/Pathways_5.csv \
+--treatment A \
+--redo_number 10 \
+--settings ./test/settings.txt \
+--rebound_size 30000 \
+-o output \
+--tag test \
+--cores 3
 ```
 
-Besides the agreements shown in the above example command, the simulator can be executed with several other arguments to provide a more detailed control of the viral evolution. All possible arguments are listed below:
+Besides the agreements shown in the above example command, the simulator can be executed with several other arguments to provide more detailed control of the viral evolution. All possible arguments are listed below:
 
 ### Command Line ARGS:
 
 | Options | Description | Default |
 | --- | --- | --- |
 | `--seed` | Provide a random seed. If not provided, the script will generate one automatically | None |
-| `-m`, `-mode` | Tells the script to run new simulations from the input starting materials by `init`, or continue the previous runs from existing simulation outputs by `cont` | `init` |
+| `-mode` | Tells the script to run new simulations from the input starting materials by `init`, or continue the previous runs from existing simulation outputs by `cont` | `init` |
 | `-i` | Provides the directory where Fasta files with starting materials are stored` | None |
 | `--run_number` | Pefines the number of simulations to run | 1 |
 | `--start_number` | Provide the index of the first simulation to run | 1 |
-| `--disc_simu` | Provides the index of seperate simulation to run | None |
-| `-r`, `--ref` | Provides the reference sequence | None |
+| `--disc_simu` | Provides the index of separate simulation to run | None |
+| `--ref` | Provides the reference sequence | None |
 | `-g` | Maximum number of generations in each simulation | 5 |
 | `--sample_time` | Saves the intermediate simulated population every `sample_time` generations | 5 |
 | `--score_info` | Provides synthetic mutation pairs act against each synthetic drug pressure | None |
@@ -104,14 +109,13 @@ The results of the simulations are to be saved in the output folder defined by `
 
 In each independent simulation:
 
-  * Each simulation will have its unique subfolder named after the number of the starting materials:
-    - The outputs of the simulation starting from material group #11 will be stored in the subfolder Outputs/_Simulation_time_11_.
+  * The outputs will be stored in a unique subfolder.
   
   * The simulator collects the viral population at the simulated viral rebound, the name of which composes of:
     - Tag
     - treatment
-    - number of generations took to rebound
-    - For one simulated viral rebound at generation 100 under synthetic drug class 'A' with tag 'Test': `Test_simu_A_g100_rebound.fa`
+    - number of generations it took to rebound
+    - For one simulated viral rebound at generation 100 under synthetic drug class 'A' with tag 'test': `test_simu_A_g166_rebound.fa`
     
   * The size of the simulated population over generations is recorded in _VL_tracking_file.csv_.
 
