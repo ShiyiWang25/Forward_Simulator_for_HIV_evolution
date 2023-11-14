@@ -63,8 +63,8 @@ def simu_treated(args):
                          args.snv, args.rec, args.R, args.rebound_size, args.o, args.tag,
                          args.cores, child_states, simulation_time_list)
 
-    Parallel(n_jobs = simu_var.cores)\
-    (delayed(simu_var.job)(simulation_time) for simulation_time in simulation_time_list)
+    Parallel(n_jobs = simu_var.cores)(
+    delayed(simu_var.job)(simulation_time) for simulation_time in simulation_time_list)
     
 
 def concatemer_sepNs(input_file_path):
@@ -311,7 +311,7 @@ class Variables:
                         output_file = sequences_file, 
                         progeny_list = progeny_list, 
                         progeny_pool_size = progeny_pool_size, 
-                        tag = self.tag)
+                        tag = self.tag, rng)
                     progeny_pool_size_list[-1] = new_progeny_pool_size  
                 else:
                     # generate the progeny population
@@ -673,7 +673,7 @@ def tracking(tracking_file, treatment, initial_pop_size, tracking_treatment_gene
     
     return
     
-def write_dh_pop_file(input_file, output_file, progeny_list, progeny_pool_size, tag):
+def write_dh_pop_file(input_file, output_file, progeny_list, progeny_pool_size, tag, rng):
     seq_list = []
     with open(input_file, 'r') as f:
         seq_list = []
