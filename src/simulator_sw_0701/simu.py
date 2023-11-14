@@ -311,7 +311,8 @@ class Variables:
                         output_file = sequences_file, 
                         progeny_list = progeny_list, 
                         progeny_pool_size = progeny_pool_size, 
-                        tag = self.tag, rng)
+                        tag = self.tag, 
+                        rng = rng)
                     progeny_pool_size_list[-1] = new_progeny_pool_size  
                 else:
                     # generate the progeny population
