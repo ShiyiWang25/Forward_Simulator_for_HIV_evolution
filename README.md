@@ -34,7 +34,7 @@ source env/bin/activate
 python -m pip install git+https://github.com/ShiyiWang25/202306_Simulator.git@new_interface
 ```
 
-## python_requires = >= 3.9
+## python_requires >= 3.9
 ## Dependencies
 * numpy
 * pandas
