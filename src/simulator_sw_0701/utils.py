@@ -6,10 +6,6 @@ def _parse_args(args, **kwargs):
                         prog='Simulator',
                         description='An individual virus-based forward simulator for HIV evolution',
                         epilog='')
-    parser.add_argument('--ART',
-                        type=str,
-                        choices=['treated', 'untreated'],
-                        help='select simulation mode between with-treatment and without-treatment')
     parser.add_argument('--seed',
                         type=int,
                         help='Give the random seed (optional).')    
