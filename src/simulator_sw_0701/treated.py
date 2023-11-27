@@ -21,9 +21,6 @@ from pyfaidx import Fasta, Faidx
 
 EOL = "\n"              # end of line terminator
 
-def simu_untreated(args):
-    print('Testing: For simulating the HIV evolution in the untreated condition.')
-
 def simu_treated(args):   
 
     # determine simulation run numbers: e.g., from Simulation 1 to Simulation 10
