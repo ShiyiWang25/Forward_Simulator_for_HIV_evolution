@@ -1,5 +1,5 @@
 import sys
-from . import treated, untreated
+from . import utils, treated, untreated
 
 def main():
     if len(sys.argv) < 2:
