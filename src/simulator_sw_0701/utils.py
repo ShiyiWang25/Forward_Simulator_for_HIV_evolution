@@ -4,7 +4,7 @@ def _parse_args(args, **kwargs):
 
     parser = argparse.ArgumentParser(
                         prog='Simulator',
-                        description='An individual virus-based forward simulator for HIV evolution,
+                        description='An individual virus-based forward simulator for HIV evolution',
                         epilog='')
     parser.add_argument('--ART',
                         type=str,
