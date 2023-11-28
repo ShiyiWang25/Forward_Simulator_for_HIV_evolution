@@ -215,11 +215,11 @@ class Variables:
             # create an initial viral population
             if self.input_file_path:
                 initial_pop_size = 1
-                line_numbers =  = write_starting_pop(simulation_time, 
-                                                     input_file_path,
-                                                     initial_pop_size,
-                                                     sequences_file,
-                                                     self.tag)
+                line_numbers = write_starting_pop(simulation_time, 
+                                                  input_file_path,
+                                                  initial_pop_size,
+                                                  sequences_file,
+                                                  self.tag)
                 concatemer, initial_pop_size = concatemer_sepNs(sequences_file)
 
                 note = EOL.join([f"Initial population size: {initial_pop_size}",
