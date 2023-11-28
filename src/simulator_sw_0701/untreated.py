@@ -114,7 +114,7 @@ def codon_lib_generator():
 class Variables:
         
     def __init__(self, seed, mode, founders, run_number, start_number,
-                 disc_simu, max_limit, ref, g, sample_time, score_info,
+                 disc_simu, ref, g, sample_time, score_info,
                  treatment, redo_number, settings, snv, rec, R,
                  rebound_size, o, tag, cores, child_states, simulation_time_list):
         self.seed = seed
@@ -123,7 +123,6 @@ class Variables:
         self.run_number = run_number
         self.start_number = start_number
         self.disc_simu = disc_simu
-        self.max_limit = max_limit
         self.ref = ref
         self.g = g
         self.sample_time = sample_time
@@ -134,7 +133,7 @@ class Variables:
         self.snv = snv
         self.rec = rec
         self.R = R
-        self.rebound_size = rebound_size
+        self.max_limit = rebound_size #this variable is used to define the set point in the untreated condition
         self.o = o
         self.tag = tag
         self.cores = cores
