@@ -304,19 +304,6 @@ class Variables:
                     plateau_generation = generation
                     switch = True  
                     break
-
-        if switch == False:
-            metadata(Metadata_file, 
-                     (f"In Round {str(redo_count)}: "
-                      f"Failed in establishing Drug-Naive viral population."))
-            write_file_split(concatemer = concatemer_side, output_file_path = sequences_file, tag = self.tag)
-            redo_count += 1
-            if redo_count >= self.redo_number:
-                metadata(Metadata_file, 
-                         (f"All {str(redo_count)} "
-                          f"attemps in establishing a Drug-Naive viral population failed."))
-                return
-            else: pass
             
         else: # maximum viral load control, set to 30,000, for 30 generations
             for generation in range(plateau_generation, plateau_generation + 30):
@@ -335,9 +322,6 @@ class Variables:
             progeny_list = progeny_list, 
             constant_pop_size = self.max_limit, 
             tag = self.tag)
-
-        tracking_treatment_generation_VL['Untreated'] = progeny_pool_size_list
-        tracking(tracking_file, treatment, initial_pop_size, tracking_treatment_generation_VL)
         return switch, progeny_pool_size_list
     
     def write_args(self, output_file_path):
