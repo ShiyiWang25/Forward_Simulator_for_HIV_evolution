@@ -335,9 +335,9 @@ class Variables:
             constant_pop_size = self.max_limit, 
             tag = self.tag)
 
-    tracking_treatment_generation_VL['Untreated'] = progeny_pool_size_list
-    tracking(tracking_file, treatment, initial_pop_size, tracking_treatment_generation_VL)
-    return switch, progeny_pool_size_list
+        tracking_treatment_generation_VL['Untreated'] = progeny_pool_size_list
+        tracking(tracking_file, treatment, initial_pop_size, tracking_treatment_generation_VL)
+        return switch, progeny_pool_size_list
     
     def write_args(self, output_file_path):
     
