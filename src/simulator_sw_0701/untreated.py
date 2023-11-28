@@ -282,7 +282,7 @@ class Variables:
             # check
             if progeny_pool_size == 0:
                 metadata(Metadata_file, 
-                         (f"Generation {self.generation}: "
+                         (f"Generation {generation}: "
                           f"Population size down to 0."))
                 break
             else:
@@ -696,7 +696,6 @@ def write_dh_pop_file(input_file, output_file, progeny_list, progeny_pool_size, 
 def write_pop_file(input_file, output_file, progeny_list, tag):
     seq_list = []
     with open(input_file, 'r') as f:
-        seq_list = []
         for line in f:
             if '>' not in line:
                 seq_list.append(line.rstrip())
@@ -708,8 +707,7 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
             fo.write(seq_list[progeny-1] + EOL)
             read_count += 1
     return
-        
-    
+         
 def write_file_split(concatemer, output_file_path, tag):
     seq_list = concatemer.split('N' * 5)
 
