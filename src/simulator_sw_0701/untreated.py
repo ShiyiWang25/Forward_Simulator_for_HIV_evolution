@@ -286,9 +286,6 @@ class Variables:
                           f"Population size down to 0."))
                 break
             else:
-                ## test
-                print(recombined_mutated_sequences_file, sequences_file)
-                print(progeny_pool_size, progeny_list)
                 write_pop_file(input_file = recombined_mutated_sequences_file, 
                                output_file = sequences_file, 
                                progeny_list = progeny_list, 
@@ -419,7 +416,7 @@ def mutator(input_file, output_file, mutation_rate, rng):
             seq_mut = mutate(seq, mutation_rate, rng)
             f.write(EOL.join([
                 f">{seq_name}",
-                f"{seq_mut}"
+                f"{seq_mut}{EOL}"
             ]))
 
 def mutate(seq, mutation_rate, rng):
@@ -668,7 +665,6 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
         for line in f:
             if '>' not in line:
                 seq_list.append(line.rstrip())
-                print([i[:2] for i in seq_list])
                 
     read_count = 0
     with open(output_file, "w") as fo:
