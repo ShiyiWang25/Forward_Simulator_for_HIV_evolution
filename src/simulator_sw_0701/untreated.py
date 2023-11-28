@@ -346,7 +346,7 @@ class Variables:
                          f"Starting materials stored in: {self.input_dir}",
                          f"Reference: {self.ref}"
                          f"Mutation rate: {self.snv}; Recombination rate: {self.rec}",
-                         f"Rebound size: {self.rebound_size}",
+                         f"Rebound size: {self.max_limit}",
                          f"---*---*---*---*---*---*---"])
     
         metadata(output_file_path, note)
