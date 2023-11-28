@@ -297,12 +297,12 @@ class Variables:
                                    output_file = plateau_pop_file, 
                                    progeny_list = progeny_list, 
                                    tag = self.tag)
-                    progeny_pool_size_list[-1] = self.max_limit  
+                    #progeny_pool_size_list[-1] = self.max_limit  
                     plateau_generation = generation
                     switch = True  
                     break
             
-        else: # maximum viral load control, set to 30,000, for 30 generations
+        if switch == True: # maximum viral load control, set to 30,000, for 30 generations
             for generation in range(plateau_generation, plateau_generation + 30):
                 progeny_list, progeny_pool_size, recombined_mutated_sequences_file = (
                     each_generation(sequences_file, self.snv, self.rec, self.score_info, 
@@ -310,15 +310,22 @@ class Variables:
                 progeny_pool_size_list.append(progeny_pool_size)
                 metadata(Metadata_file, 
                          f"{generation}: {progeny_pool_size}") 
+            
+                write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
+                                        output_file = sequences_file, 
+                                        progeny_list = progeny_list, 
+                                        constant_pop_size = self.max_limit, 
+                                        tag = self.tag)
+            
             final_pop_file = os.path.join(output_folder, 
                                           f"Simu_{str(simulation_time)}_{self.tag}_"
                                           f"simu_{str(treatment)}_g_{str(generation)}_"
                                           f"final.fa")
             write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
-            output_file = final_pop_file, 
-            progeny_list = progeny_list, 
-            constant_pop_size = self.max_limit, 
-            tag = self.tag)
+                                        output_file = final_pop_file, 
+                                        progeny_list = progeny_list, 
+                                        constant_pop_size = self.max_limit, 
+                                        tag = self.tag)
         return switch, progeny_pool_size_list
     
     def write_args(self, output_file_path):
