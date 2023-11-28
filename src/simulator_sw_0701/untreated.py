@@ -113,13 +113,13 @@ def codon_lib_generator():
 
 class Variables:
         
-    def __init__(self, seed, mode, founders, run_number, start_number,
+    def __init__(self, seed, mode, input_dir, run_number, start_number,
                  disc_simu, ref, g, sample_time, score_info,
                  treatment, redo_number, settings, snv, rec, R,
                  rebound_size, o, tag, cores, child_states, simulation_time_list):
         self.seed = seed
         self.mode = mode
-        self.founders = founders
+        self.input_dir = input_dir
         self.run_number = run_number
         self.start_number = start_number
         self.disc_simu = disc_simu
@@ -160,7 +160,7 @@ class Variables:
         # store it in sequences_file
         # take notes of metadata
         initial_pop_size, concatemer, p, r, c, MB_DRM = self.preparation(simulation_time,
-                                                                         self.founders,
+                                                                         self.input_dir,
                                                                          output_folder,
                                                                          sequences_file,
                                                                          Metadata_file)
