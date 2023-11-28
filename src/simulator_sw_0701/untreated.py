@@ -160,7 +160,6 @@ class Variables:
         # store it in sequences_file
         # take notes of metadata
         initial_pop_size, concatemer, p, r, c, MB_DRM = self.preparation(simulation_time,
-                                                                         self.input_dir,
                                                                          output_folder,
                                                                          sequences_file,
                                                                          Metadata_file)
@@ -205,17 +204,17 @@ class Variables:
         tracking_treatment_generation_VL[self.treatment] = progeny_pool_size_list  
         tracking(tracking_file, self.treatment, initial_pop_size, tracking_treatment_generation_VL)
     
-    def preparation(self, simulation_time, input_file_path, output_folder, sequences_file, Metadata_file):
+    def preparation(self, simulation_time, output_folder, sequences_file, Metadata_file):
 
         if self.mode == 'init':
             # write all args to the metadata file.
             self.write_args(Metadata_file)
 
             # create an initial viral population
-            if self.input_file_path:
+            if self.input_dir:
                 initial_pop_size = 1
                 line_numbers = write_starting_pop(simulation_time, 
-                                                  input_file_path,
+                                                  self.input_dir,
                                                   initial_pop_size,
                                                   sequences_file,
                                                   self.tag)
