@@ -668,6 +668,7 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
         for line in f:
             if '>' not in line:
                 seq_list.append(line.rstrip())
+                print([i[:2] for i in write_pop_file])
                 
     read_count = 0
     with open(output_file, "w") as fo:
