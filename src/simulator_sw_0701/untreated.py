@@ -286,6 +286,9 @@ class Variables:
                           f"Population size down to 0."))
                 break
             else:
+                ## test
+                print(recombined_mutated_sequences_file, sequences_file)
+                print(progeny_pool_size, progeny_list)
                 write_pop_file(input_file = recombined_mutated_sequences_file, 
                                output_file = sequences_file, 
                                progeny_list = progeny_list, 
@@ -674,24 +677,6 @@ def tracking(tracking_file, treatment, initial_pop_size, tracking_treatment_gene
         df.to_csv(tracking_file, index = False)
     
     return
-    
-def write_dh_pop_file(input_file, output_file, progeny_list, progeny_pool_size, tag, rng):
-    seq_list = []
-    with open(input_file, 'r') as f:
-        seq_list = []
-        for line in f:
-            if '>' not in line:
-                seq_list.append(line.rstrip())
-                
-    read_count = 0
-    with open(output_file, "w") as fo:
-        for progeny in progeny_list:
-            repeat = int(rng.poisson(30000/progeny_pool_size, 1)[0])
-            for r in range(repeat):
-                fo.write('>'+ tag + '_' + str(read_count + 1) + EOL)
-                fo.write(seq_list[progeny-1] + EOL)
-                read_count += 1
-    return read_count
     
 def write_pop_file(input_file, output_file, progeny_list, tag):
     seq_list = []
