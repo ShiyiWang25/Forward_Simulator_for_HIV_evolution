@@ -320,15 +320,15 @@ class Variables:
         else: # maximum viral load control, set to 30,000, for 30 generations
             for generation in range(plateau_generation, plateau_generation + 30):
                 progeny_list, progeny_pool_size, recombined_mutated_sequences_file = (
-                each_generation(sequences_file, self.snv, self.rec, self.score_info, 
-                                self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng))
+                    each_generation(sequences_file, self.snv, self.rec, self.score_info, 
+                                    self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng))
                 progeny_pool_size_list.append(progeny_pool_size)
                 metadata(Metadata_file, 
                          f"{generation}: {progeny_pool_size}") 
             final_pop_file = os.path.join(output_folder, 
                                           f"Simu_{str(simulation_time)}_{self.tag}_"
                                           f"simu_{str(treatment)}_g_{str(generation)}_"
-                                          f"final.fa"       
+                                          f"final.fa")
             write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
             output_file = final_pop_file, 
             progeny_list = progeny_list, 
