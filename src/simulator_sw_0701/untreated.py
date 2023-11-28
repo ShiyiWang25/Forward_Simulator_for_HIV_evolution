@@ -57,7 +57,7 @@ def simu(args):
 
     # store all arguments
     # save space for child_states and simulation_time_list
-    simu_var = Variables(args.seed, args.mode, args.i, args.run_number, args.start_number,
+    simu_var = Variables(args.seed, args.mode, args.input_dir, args.run_number, args.start_number,
                          args.disc_simu, args.ref, args.g, args.sample_time,
                          args.score_info, args.treatment, args.redo_number, args.settings,
                          args.snv, args.rec, args.R, args.rebound_size, args.o, args.tag,
