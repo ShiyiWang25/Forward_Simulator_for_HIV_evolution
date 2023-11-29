@@ -675,7 +675,7 @@ def replication(input_file_path, ref_sequence, drug, df_scores, p, r, c, MB_DRM,
     line_count = 0
     seq = ''
     
-    #ReadID_list = [] # store the ReadID for each seq
+    ReadID_list = [] # store the ReadID for each seq
     
     progeny_number = 0
     progeny_number_list = [] # store the progeny number for each seq
