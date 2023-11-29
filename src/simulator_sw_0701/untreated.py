@@ -297,8 +297,7 @@ class Variables:
                                    output_file = plateau_pop_file, 
                                    progeny_list = progeny_list, 
                                    tag = self.tag)
-                    #progeny_pool_size_list[-1] = self.max_limit  
-                    plateau_generation = generation
+                    plateau_generation = generation + 1
                     switch = True  
                     break
             
@@ -307,29 +306,30 @@ class Variables:
                 progeny_list, progeny_pool_size, recombined_mutated_sequences_file = (
                     each_generation(sequences_file, self.snv, self.rec, self.score_info, 
                                     self.ref, self.treatment, p, r, c, MB_DRM, self.R, rng))
-                progeny_pool_size_list.append(progeny_pool_size)
+
+                if generation != plateau_generation + 29:
+                    write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
+                                            output_file = sequences_file, 
+                                            progeny_list = progeny_list, 
+                                            constant_pop_size = self.max_limit, 
+                                            tag = self.tag, 
+                                            rng = rng
+                                            )
+                else:
+                    final_pop_file = os.path.join(output_folder, 
+                                                  f"Simu_{str(simulation_time)}_{self.tag}_"
+                                                  f"simu_{str(self.treatment)}_g_{str(generation)}_"
+                                                  f"final.fa")
+                    write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
+                                            output_file = final_pop_file, 
+                                            progeny_list = progeny_list, 
+                                            constant_pop_size = self.max_limit, 
+                                            tag = self.tag, 
+                                            rng = rng
+                                           )
+                progeny_pool_size_list.append(self.max_limit)
                 metadata(Metadata_file, 
-                         f"{generation}: {progeny_pool_size}") 
-            
-                write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
-                                        output_file = sequences_file, 
-                                        progeny_list = progeny_list, 
-                                        constant_pop_size = self.max_limit, 
-                                        tag = self.tag, 
-                                        rng = rng
-                                       )
-            
-            final_pop_file = os.path.join(output_folder, 
-                                          f"Simu_{str(simulation_time)}_{self.tag}_"
-                                          f"simu_{str(treatment)}_g_{str(generation)}_"
-                                          f"final.fa")
-            write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
-                                    output_file = final_pop_file, 
-                                    progeny_list = progeny_list, 
-                                    constant_pop_size = self.max_limit, 
-                                    tag = self.tag, 
-                                    rng = rng
-                                   )
+                         f"{generation}: {self.max_limit}") 
         return switch, progeny_pool_size_list
     
     def write_args(self, output_file_path):
