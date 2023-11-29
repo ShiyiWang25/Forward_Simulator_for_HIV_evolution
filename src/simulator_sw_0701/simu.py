@@ -18,7 +18,6 @@ import sys
 from pyfaidx import Fasta, Faidx
 
 
-
 EOL = "\n"              # end of line terminator
 
 
@@ -68,7 +67,15 @@ def simu_treated(args):
     
 
 def concatemer_sepNs(input_file_path):
-    # concatenate all seq in a multi-FASTA file
+    '''
+    Concatenate all seq in a multi-FASTA file
+
+    Args: 
+    input_file_path (str): the target multi-FASTA file
+
+    Returns:
+    One sequence concatemer (str) and the number of sequences (int)
+    '''
     con_seq = ''
     count_seq = 0
     with open(input_file_path, 'r') as f:
@@ -78,9 +85,12 @@ def concatemer_sepNs(input_file_path):
                 con_seq += 'N' * 5
                 count_seq += 1
     return (con_seq[:-5]), count_seq
-
     
 def codon_lib_generator():
+    '''
+    Generate the codon table for translating a genetic code into a sequence of amino acids.
+    Human specific.
+    '''
     Base1_list = ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T',
                   'T', 'T', 'T', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
                   'C', 'C', 'C', 'C', 'C', 'C', 'A', 'A', 'A', 'A', 'A', 'A', 'A',
@@ -141,12 +151,21 @@ class Variables:
         self.simulation_time_list = simulation_time_list
 
     def job(self, simulation_time):   
+        '''
+        Run each simulation
+
+        Args: 
+        simulation_time (int): simulation run ID, e.g., Simulation# 1
+
+        Returns:
+        The outputs and metadata of this simulation run stored in one separate folder.
+        '''
         
-        # create the result folder for this simulation run if not existed
+        # create the result folder for this simulation run if not exist
         output_folder = os.path.join(self.o, f"Simulation_time_{simulation_time + 1}")
         Path(output_folder).mkdir(parents=True, exist_ok=True)
         
-        # name the file with starting materials
+        # name the file with the starting materials
         sequences_file = os.path.join(output_folder, f"{self.tag}_simu.fa")
         
         # create a Metadata file
@@ -164,17 +183,19 @@ class Variables:
                                                                          sequences_file,
                                                                          Metadata_file)
         
-        # store the starting materials to "concatemer_side"
+        # store the starting materials to "concatemer_side" for repetitive use
         concatemer_side = concatemer
         
         # perform the simulation for redo_number times unless reaching rebound
         # define the pointer to decide whether to continuously repeat the simulation run
-        switch = False
+        # False: fail to rebound
+        # True: rebound
+        switch = False 
         
         # count the number of repeats 
         redo_count = 0
         
-        while not switch:
+        while not switch: 
             switch, progeny_pool_size_list = Variables.each_repeat(self, Metadata_file,
                                                                    simulation_time, output_folder,
                                                                    sequences_file, p, r, c, MB_DRM,
@@ -183,31 +204,51 @@ class Variables:
             
             if not switch: 
                 # repeat
-                # rewrite starting file using the concatemer_side
-                note = (f"In Round {redo_count} : Virus is completely suppressed"
-                        f" in treatment {self.treatment} with"
-                        f" {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
-
-                metadata(Metadata_file, note)
+                # rewrite the starting file using the concatemer_side
+                metadata(Metadata_file, 
+                         (f"In Round {redo_count} : Virus is completely suppressed"
+                          f" in treatment {self.treatment} with"
+                          f" {progeny_pool_size_list[-1]/progeny_pool_size_list[-2]}")
+                        )
 
                 write_file_split(concatemer = concatemer_side,
                                  output_file_path = sequences_file, tag = self.tag)
 
+                # stop when reach the repeat number
                 if redo_count >= self.redo_number:
                     note = f"Virus fails to rebound in all attempts under treatment {self.treatment}"
                     metadata(Metadata_file, note)
                     return
-            
+       
+        # If reach a successful viral rebound
+        # store the viral loading tracking file for this repeat in this simulation run
         tracking_treatment_generation_VL[self.treatment] = progeny_pool_size_list  
         tracking(tracking_file, self.treatment, initial_pop_size, tracking_treatment_generation_VL)
     
     def preparation(self, simulation_time, output_folder, sequences_file, Metadata_file):
+        '''
+        Initiate all parameters used in each simulation run
 
+        Args:
+        simulation_time (int): simulation run ID, e.g., Simulation# 1
+        output_folder (str): dir to store the simulation outputs
+        sequences_file (str): the file that stores the starting material in the simulation run
+        Metadata_file (str): store the metadata of each simulation run
+
+        Returns:
+        initial_pop_size (int): the size of the starting viral population
+        concatemer (str): starting sequences stored as a concatamer
+        p (float): drug pressure
+        r (float): fitness increase resulting from the acquisition of one drug-resistance mutation
+        c (float): fitness increase resulting from the acquisition of one compensatory mutation
+        MB_DRM (float): fitness decrease due to the acquisition of one drug-resistance mutation
+        '''
+        
         if self.mode == 'init':
             # write all args to the metadata file.
             self.write_args(Metadata_file)
 
-            # create an initial viral population
+            # create a starting viral population with 3000 sequences
             if self.input_dir:
                 initial_pop_size = 30000
                 start_materials_fas = write_starting_pop(simulation_time, 
@@ -226,6 +267,7 @@ class Variables:
                 sys.exit()
 
         elif self.mode == 'cont':
+            # Continue from previous simulation outputs
 
             note = EOL.join(['---*---*---*---*---*---*---',
                              f'Continue the simulation on {time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())}'])
@@ -259,6 +301,7 @@ class Variables:
     def each_repeat(self, Metadata_file, simulation_time, output_folder,
                     sequences_file, p, r, c, MB_DRM, redo_count, switch):
 
+
         # generate a random seed
         switch = False
         rng = stochastic_function(self.child_states 
@@ -275,12 +318,17 @@ class Variables:
             progeny_pool_size_list.append(progeny_pool_size)
             metadata(Metadata_file, 
             		 f"{generation}: {progeny_pool_size}")
-
-            # check
+            
+            # simulated viral suppression is achieved
+            # when the population size is lower than 100 for at least 3 generations
+            # stops the simulation
             if (len(progeny_pool_size_list) >= 3 and progeny_pool_size < 100 and 
                 progeny_pool_size_list[-2] < 100 and progeny_pool_size_list[-3] < 100):
                 break
-
+                    
+            # simulated viral rebound is achieved
+            # when the population size continues to grow over at least 3 generations and 
+            # the latest population size is higher than the given threshold self.rebound_size, e.g., 300,000
             elif (len(progeny_pool_size_list) >= 3 and 
                   progeny_pool_size > self.rebound_size and 
                   progeny_pool_size_list[-1] > progeny_pool_size_list[-2] and 
@@ -303,7 +351,7 @@ class Variables:
                 break
 
             else:
-                # set a pseudo drug-holiday at generation 14
+                # set a pseudo-drug-holiday at Generation 14
                 # amplify the population size to 30,000
                 if generation == 14:
                     new_progeny_pool_size = write_dh_pop_file(
@@ -316,14 +364,14 @@ class Variables:
                     progeny_pool_size_list[-1] = new_progeny_pool_size  
                 else:
                     # generate the progeny population
-                    # ATTENTION: output file will cover the previous concatemer_output file
+                    # ATTENTION: the output file will cover the previous concatemer_output file
                     write_pop_file(input_file = recombined_mutated_sequences_file, 
                                    output_file = sequences_file, 
                                    progeny_list = progeny_list, 
                                    tag = self.tag)
 
                 # save intermediate timepoint data
-                # e.g., ./HXB2_simu_g100.fa
+                # e.g., ./HXB2_simu_g10.fa
                 if generation % self.sample_time == 0:
                     put_aside = os.path.join(output_folder, 
                                              f"{self.tag}_simu_{self.treatment}_"
@@ -337,7 +385,8 @@ class Variables:
 
     
     def write_args(self, output_file_path):
-    
+
+        # write all args to the metadata file.
         note = EOL.join(['Settings used: ',
                          f"Basic R : {self.R}",
                          f"Repeat time: {self.run_number}",
@@ -351,9 +400,41 @@ class Variables:
 
             
 def each_generation(sequences_file, snv, rec, score_info, ref, treatment, p, r, c, MB_DRM, R, rng):
+    '''
+    Simulate the viral evolution by generations.
+    In each generation, viral genomes will go through four steps:
+    1) mutation
+    2) recombination (20% of the entire population)
+    3) fitness calculation
+    4) replication and generating a new population
+
+    Args:
+    sequences_file (str): file with the starting sequences; 
+        will be covered by the new population at the end of each generation
+
+    snv (float): mutation rate.
+    rec (float): recombination rate.
+    score_info (str): A CSV file defining synthetic associated drug-resistance mutations 
+                      and their compensatory mutations.
+    p (float): drug pressure.
+    r (float): fitness increase resulting from the acquisition of one drug-resistance mutation.
+    c (float): fitness increase resulting from the acquisition of one compensatory mutation.
+    MB_DRM (float): fitness decrease due to the acquisition of one drug-resistance mutation.
+
+    R (float): Basic reproduction ratio.
+    rng: random seed generated; specific for each repeat in each simulation run.
+
+    Returns:
+    progeny_list (list): the index of ancestor mutated and recombined sequences for each progeny sequence
+                         example: [0,1,1]
+                                   ancestor sequence 0 replicates once;
+                                   ancestor sequence 1 replicates twice.
+    progeny_pool_size (int): number of progeny sequenced generated in this generation
+    recombined_mutated_sequences_file (str): file stored the mutated and recombined sequences.
+    '''
     
     # mutate
-    # ./HXB2_simu_ms
+    # mutated_sequences_file example: ./HXB2_simu_ms, tag = HXB2_simu
     mutated_sequences_file = f"{sequences_file.split('.fa')[0]}_ms.fa"
     mutator(input_file = sequences_file,
             output_file = mutated_sequences_file,
@@ -393,6 +474,7 @@ def find_different_nuc(codon_ref, codon_seq):
     return compare_list
 
 def get_fasta_tag(file):
+    # get the seq ID from one FASTA file
     with open(file, 'r') as f:
         for line in f:
             if '>' in line:
@@ -401,7 +483,7 @@ def get_fasta_tag(file):
     return seq_tag
 
 def get_starting_materials(starting_material_directory):
-    
+    # get the FASTA file names in the input dir
     fasta_file_list = []
     for root, dirs, files in os.walk(starting_material_directory):
         for file in files:
@@ -411,6 +493,7 @@ def get_starting_materials(starting_material_directory):
     return fasta_file_list
     
 def get_fasta_seq(input_file):
+    # get the sequence from one FASTA file
     with open(input_file, 'r') as f:
         for line in f:
             if '>' not in line:
@@ -437,8 +520,8 @@ def mutator(input_file, output_file, mutation_rate, rng):
 def mutate(seq, mutation_rate, rng):
     
     # get positions to mutate
-    mean = len(seq) * mutation_rate
-    mut_count = rng.poisson(mean, 1)[0]
+    mean = len(seq) * mutation_rate # average number of mutation in the target sequence based on the mutation rate
+    mut_count = rng.poisson(mean, 1)[0] # poisson distrubution
     positions = sorted(rng.choice(np.arange(0, len(seq)), mut_count, replace=False))
     
     if len(positions) == 0:
@@ -465,13 +548,15 @@ def random_seed_generator(output_dir, total_number, seed=None):
         f.write(f"Seed set to {seed.entropy}{EOL}")
 
     return seed.spawn(total_number)
-
     
 def read_fasta_file(input_file):
     seq_lib = Fasta(input_file)
     return seq_lib
     
 def recombination(input_file, output_file, recombination_rate, rng):
+    # randomly select 20% of sequences for recombination
+    # mimicing the clinical situation
+    
     seq_lib = read_fasta_file(input_file)
     seq_names = list(seq_lib.keys())
     
@@ -480,23 +565,22 @@ def recombination(input_file, output_file, recombination_rate, rng):
     seq_names_norecombine = sorted(list(set(seq_names) - set(seq_to_recombine)))
     
     recombine_pairs_lib = {}
-    # pair
+    # pick two sequences and pair
     for i in range(int(len(seq_to_recombine)/2)):
         paired = rng.choice(seq_to_recombine, 2, replace=False)
         recombine_pairs_lib[paired[0]] = paired[1]
         seq_to_recombine.remove(paired[0])
         seq_to_recombine.remove(paired[1])
     
-    
+    # write the sequences that don't recombine
     with open(output_file, "w") as f:
-    
         for seq_name in seq_names_norecombine:
             seq = seq_lib[seq_name][:].seq
             f.write(EOL.join([
                 f">{seq_name}",
                 f"{seq}{EOL}"
             ]))
-            
+        # write the sequences that recombine
         for key, value in recombine_pairs_lib.items():
             seq1 = seq_lib[key][:].seq
             seq2 = seq_lib[value][:].seq
@@ -509,8 +593,10 @@ def recombination(input_file, output_file, recombination_rate, rng):
             ]))
 
 def recombine(seq1, seq2, recombination_rate, rng):
-    mean = (len(seq1) -1)* recombination_rate
+    # recombine between two sequences
+    mean = (len(seq1) -1)* recombination_rate # number of recombination based on the recombination rate
     rec_count = rng.poisson(mean, 1)[0]
+    # random select the recombination sites
     positions = sorted(rng.choice(np.arange(1, len(seq1)), rec_count, replace=False))
     
     if len(positions) == 0:
@@ -520,7 +606,6 @@ def recombine(seq1, seq2, recombination_rate, rng):
         return seq1_rec, seq2_rec
         
 def R_cal(R0, x, p):
-    
     if p == 0:
         R = R0 * 2/(1+e**(-x))
     else:
@@ -529,15 +614,39 @@ def R_cal(R0, x, p):
     return R
 
 def R_calculation(drug, seq, ref_sequence, df_scores, p, r, c, MB_DRM, R0):
-    
-    mutations = translator(seq, ref_sequence)
-    pDRMs = df_scores['DRM'].tolist() # all possible DRMs
-                            
-    DRM_CM_lib = {} # store the DRM-CM found in that virus
-    neDRM = 0 # number of effective DRMs in the seq
-    
-    DRMs = list(set(mutations).intersection(set(pDRMs))) # DRMs in target sequence
+    '''
+    Calculate the fitness of each sequence based on several factors:
+    1) presence or absence of drug pressure
+    2) presence of drug-resistance mutations
+    3) presence of corresponding compensatory mutations
+    4) total mutational burden in the target sequence
 
+    Args:
+    drug (str): drug name.
+    seq (str): target sequence.
+    df_scores (df): drug-resistance mutations and their compensatory mutations against the drug used.
+    R0 (float): basic reproductive ratio.
+
+    Returns:
+    R (float): the fitness of the target sequence under the given drug pressure.
+    '''
+
+    # find all non-synonymous mutations in the target sequence
+    mutations = translator(seq, ref_sequence)
+    # all possible DRMs against the drug used.
+    pDRMs = df_scores['DRM'].tolist()
+    
+    # create a lib to store the DRM-CM pairs found in the target sequence       
+    DRM_CM_lib = {} 
+    # will store the number of effective DRMs in the seq
+    neDRM = 0 
+
+    # all DRMs in the target sequence
+    DRMs = list(set(mutations).intersection(set(pDRMs))) 
+
+    # find the number of effective DRMs in the seq
+    # no additive effects
+    # max is 1.
     for DRM in DRMs:
         pCMs = df_scores['CM'].tolist()[pDRMs.index(DRM)][2:-2].split("', '") # possible CMs
         CMs_number = len(set(mutations).intersection(set(pCMs))) # CMs in target sequence
@@ -546,17 +655,22 @@ def R_calculation(drug, seq, ref_sequence, df_scores, p, r, c, MB_DRM, R0):
             neDRM = 1
         else: pass
 
+    # calculate the combined influence on fitness considering 
+    # drug-resistance mutations, compensatory mutations, and total mutational burden
     x = 0
-    if p == 0:
+    if p == 0: # without drug pressure
         x = 0 - MB_DRM * len(DRMs) + sum(list(DRM_CM_lib.values()))*c - MB_DRM/10 * len(mutations)
-    else:
+    else:  # with drug pressure
         x = neDRM * r - MB_DRM * len(DRMs) + sum(list(DRM_CM_lib.values()))*c - MB_DRM/10 * len(mutations)
 
+    # calculate the fitness of the target sequence under given drug pressure
     R = R_cal(R0, x, p)
 
     return R
 
 def replication(input_file_path, ref_sequence, drug, df_scores, p, r, c, MB_DRM, R0, rng):
+    # calculate the number of progeny sequences a target sequence can generate
+    # based on its fitness, R, under given drug pressure, p
     
     line_count = 0
     seq = ''
@@ -601,8 +715,18 @@ def switch(seq1, seq2, positions):
     return seq1, seq2
 
 def translator(nuc_seq, ref_sequence):
-    # checked. Correct. 0522.
-    
+    '''
+    Align the target nucleotide sequences to the reference sequence.
+    Identify all non-synonymous mutations in the target sequence.
+    Specified for HIV gag-pol sequence, 4.5kb.
+
+    Args:
+    nuc_seq (str): target nucleotide sequence
+    ref_sequence (str): reference sequence
+
+    Returns:
+    aa_mutation_list (list): a list of non-synonymous mutations detected in the target sequence.
+    '''
     codon_lib = codon_lib_generator()
     
     # get HXB2_PR
@@ -708,7 +832,6 @@ def write_pop_file(input_file, output_file, progeny_list, tag):
             read_count += 1
     return
         
-    
 def write_file_split(concatemer, output_file_path, tag):
     seq_list = concatemer.split('N' * 5)
 
