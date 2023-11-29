@@ -315,17 +315,21 @@ class Variables:
                                         output_file = sequences_file, 
                                         progeny_list = progeny_list, 
                                         constant_pop_size = self.max_limit, 
-                                        tag = self.tag)
+                                        tag = self.tag, 
+                                        rng = rng
+                                       )
             
             final_pop_file = os.path.join(output_folder, 
                                           f"Simu_{str(simulation_time)}_{self.tag}_"
                                           f"simu_{str(treatment)}_g_{str(generation)}_"
                                           f"final.fa")
             write_constant_pop_file(input_file = recombined_mutated_sequences_file, 
-                                        output_file = final_pop_file, 
-                                        progeny_list = progeny_list, 
-                                        constant_pop_size = self.max_limit, 
-                                        tag = self.tag)
+                                    output_file = final_pop_file, 
+                                    progeny_list = progeny_list, 
+                                    constant_pop_size = self.max_limit, 
+                                    tag = self.tag, 
+                                    rng = rng
+                                   )
         return switch, progeny_pool_size_list
     
     def write_args(self, output_file_path):
@@ -712,7 +716,7 @@ def write_starting_pop(simulation_time, input_file_path, pop_size, output_file_p
                 read_count += 1
     return line_numbers
 
-def write_constant_pop_file(input_file, output_file, progeny_list, constant_pop_size, tag):
+def write_constant_pop_file(input_file, output_file, progeny_list, constant_pop_size, tag, rng):
     seq_list = []
     with open(input_file, 'r') as f:
         seq_list = []
